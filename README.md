@@ -1,1 +1,1 @@
-# IC-2020
+# Iniciação Científica - 2020
