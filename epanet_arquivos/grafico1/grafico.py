@@ -1,13 +1,7 @@
 import pandas as pd
 import numpy as np
-# Lendo e separando dados
-dados = pd.read_csv("dados.csv")
-dados1 = dados[dados["Erro"]<=0.07410]
+from formata_dados import formata 
 
-x =  np.array(dados1["Rg3"])[0:450]
-y =  np.array(dados1["Rg1"])[0:450]
-z =  np.array(dados1["Rg2"])[0:450]
-err = np.array(dados1["Erro"])[0:450]
 
 """
 import matplotlib.pyplot as plt
@@ -23,17 +17,38 @@ surf = ax.plot_surface(x,y,z,cmap=cm.coolwarm, linewidth=0,antialiased=False)
 
 fig.colorbar(surf, shrink=0.5, aspect=5)
 """
+matriz = formata()
 
+import matplotlib.pyplot as plt
+np.random.seed(19680801)
+
+data = {'a': np.arange(50),
+        'c': np.random.randint(0, 50, 50),
+        'd': np.random.randn(50)}
+data['b'] = data['a'] + 10 * np.random.randn(50)
+data['d'] = np.abs(data['d']) * 100
+
+fig, ax = plt.subplots()
+ax.scatter('a', 'b', c='c', s='d', data=data)
+ax.set(xlabel='entry a', ylabel='entry b')
+plt.show()
+
+"""
 from matplotlib import cbook
 from matplotlib import cm
 from matplotlib.colors import LightSource
 import matplotlib.pyplot as plt
 
-x,y = np.meshgrid(x,y)
-z,w = np.meshgrid(z,z)
-err, llalalalal = np.meshgrid(err,err)
+v = []
+for i in np.linspace(0.01,0.2,20):
+    v.append(round(i,2))
+v = np.array(v)
+
+x,y = np.meshgrid(v,v)
+z = v 
+err = matriz 
+
 fig, ax = plt.subplots(subplot_kw=dict(projection='3d'))
-print(fig, ax)
 
 ls = LightSource(270,45)
 
@@ -42,3 +57,4 @@ surf = ax.plot_surface(x, y, z, rstride=1, cstride=1, facecolors=rgb,linewidth=0
 
 
 plt.show()
+"""

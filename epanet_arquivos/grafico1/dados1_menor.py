@@ -30,13 +30,13 @@ em.ENopenH()
 
 # Criando vetor domínio da função
 v = []
-for i in np.linspace(0.001,0.2,200):
-    v.append(round(i,3))
+for i in np.linspace(0.01,0.2,20):
+    v.append(round(i,2))
 
 for i in v:
     mudaRugosidade(g1, i)
     # Criando arquivo 
-    nome = "./dados/"+str(int(i*1000))+".csv"
+    nome = "./dados_menor/"+str(int(i*100))+".csv"
     arq = open(nome, 'w')
     arq.write("R1,R2,erro\n")
     arq.close()
@@ -46,7 +46,7 @@ for i in v:
             mudaRugosidade(g3, k)
             em.ENsolveH()
             erro = 1/3*(np.abs(n6-em.ENgetnodevalue(em.ENgetnodeindex("6"), em.EN_PRESSURE)) + np.abs(n11-em.ENgetnodevalue(em.ENgetnodeindex("11"), em.EN_PRESSURE)) + np.abs(n15 - em.ENgetnodevalue(em.ENgetnodeindex("15"), em.EN_PRESSURE)))
-            printaResultados(j, k, round(erro,5), nome)
+            printaResultados(j, k, erro, nome)
 
 
 

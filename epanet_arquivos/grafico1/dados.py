@@ -41,10 +41,10 @@ for i in v:
     for j in v:
         mudaRugosidade(g2,j)
         for k in v:
-            mudaRugosidade(g3, j)
+            mudaRugosidade(g3, k)
             em.ENsolveH()
             erro = 1/3*(np.abs(n6-em.ENgetnodevalue(em.ENgetnodeindex("6"), em.EN_PRESSURE)) + np.abs(n11-em.ENgetnodevalue(em.ENgetnodeindex("11"), em.EN_PRESSURE)) + np.abs(n15 - em.ENgetnodevalue(em.ENgetnodeindex("15"), em.EN_PRESSURE)))
-            printaResultados(i, j, k, erro)
+            printaResultados(i, j, k, round(erro,5))
 
 
 
