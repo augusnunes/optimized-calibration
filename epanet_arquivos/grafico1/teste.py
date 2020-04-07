@@ -4,8 +4,6 @@ sys.path.append('/home/augusto/Documents/epanet-python/epanet-module')
 import epamodule as em
 import numpy as np 
 
-
-
 def mudaRugosidade(grupo, rugosidade):
     for i in grupo:
         linkindex = em.ENgetlinkindex(i)
@@ -24,9 +22,8 @@ n6 = 26.54
 n11 = 34.24
 n15 = 31.88
 
-
 # lendo arquivo que contem a rede e abrindo sistema de análise hidráulica
-em.ENopen("/home/augusto/Documents/IC-2020/epanet_arquivos/grafico1/rede.inp")
+em.ENopen("/home/augusto/Documents/IC-2020/epanet_arquivos/rede/teste21.inp")
 em.ENopenH()
 
 # Criando arquivo 
@@ -39,18 +36,28 @@ v = []
 for i in np.linspace(0.001,0.2,200):
     v.append(round(i,3))
 
-for i in v:
-    mudaRugosidade(g1, i)
-    for j in v:
-        mudaRugosidade(g2,j)
-        for k in v:
-            
-            mudaRugosidade(g3, k)
-            em.ENsolveH()
-            erro = 1/3*(np.abs(n6-em.ENgetnodevalue(em.ENgetnodeindex("6"), em.EN_PRESSURE)) + np.abs(n11-em.ENgetnodevalue(em.ENgetnodeindex("11"), em.EN_PRESSURE)) + np.abs(n15 - em.ENgetnodevalue(em.ENgetnodeindex("15"), em.EN_PRESSURE)))
-            printaResultados(i, j, k, round(erro,5))
+""" teste 1
+mudaRugosidade(g1, 0.115)
+mudaRugosidade(g2, 0.079)
+mudaRugosidade(g3, 0.006)
+"""
+
+mudaRugosidade(g1, 0.115)
+mudaRugosidade(g2, 0.079)
+mudaRugosidade(g3, 0.006)
 
 
+em.ENsolveH()
+print(em.ENgetnodevalue(em.ENgetnodeindex("6"), em.EN_PRESSURE))
+print(em.ENgetnodevalue(em.ENgetnodeindex("11"), em.EN_PRESSURE))
+print(em.ENgetnodevalue(em.ENgetnodeindex("15"), em.EN_PRESSURE))
+
+erro =(np.abs(n6-em.ENgetnodevalue(em.ENgetnodeindex("6"), em.EN_PRESSURE)) + 
+    np.abs(n11-em.ENgetnodevalue(em.ENgetnodeindex("11"), em.EN_PRESSURE)) + 
+    np.abs(n15 - em.ENgetnodevalue(em.ENgetnodeindex("15"), em.EN_PRESSURE)))
+
+
+print(erro)
 
 em.ENcloseH()
 em.ENclose()
