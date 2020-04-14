@@ -2,8 +2,6 @@
 #   GRAFICO 4 - Mudando os grupos e a condição inicial - Usando outra rede (?)
 ##
 
-import sys 
-sys.path.append('/home/augusto/Documents/epanet-python/epanet-module')
 import epamodule as em
 import numpy as np 
 import time

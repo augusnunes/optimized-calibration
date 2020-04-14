@@ -30,15 +30,15 @@ df['erro_20_30_50_55_60_70'] = df['erro_20_30_50_55_60'] + df['erro_70']
 View(df)
 # Sliced Graphic (dados completos)
 for(i in 1:200){
-  df = read_csv(str_c('./Documents/IC-2020/epanet_arquivos/grafico3/dados/dados1/',i,'.csv'))
+  df = read_csv(str_c('./Documents/IC-2020/epanet_arquivos/rede-teste/grafico3/dados/dados1/',i,'.csv'))
   df['erro_20_30_50_55_60_70'] = df['erro_20']+df['erro_30']+df['erro_50']+df['erro_55']+df['erro_60'] + df['erro_70']
   df %>% 
-    ggplot(mapping = aes(x = r2, y = r3, color = erro_20_30_50_55_60_70))+
+    ggplot(mapping = aes(x = r2, y = r3, color = erro_20_30_50_55_60_70/9))+
     geom_point()+
-    scale_color_gradientn(colours = rainbow(20))+
+    scale_color_gradientn(colours = rainbow(20), limits=c(0,1))+
     labs(x = "Rugosidade 2", y = "Rugosidade 3", color = "Erro entre Ps e Pr")+
     ggtitle(str_c("Rugosidade: ", i/1000))+
-    ggsave(file=str_c(i,'.png'), path =str_c('./Documents/IC-2020/epanet_arquivos/grafico3/graficos/rainbow/'))
+    ggsave(file=str_c(i,'.png'), path =str_c('./Documents/IC-2020/epanet_arquivos/rede-teste/grafico3/graficos/rainbow/'))
 }
 
 # Graduando com linhas de vazao
@@ -71,7 +71,7 @@ for(i in 1:20){
   df %>% 
     ggplot(mapping = aes(x = R1, y = R2, color = erro))+
     geom_point()+
-    scale_color_gradientn(colours = rainbow(10))+
+    scale_color_gradientn(colours = rainbow(10), limits=c(0,1))+
     labs(x = "Rugosidade 1", y = "Rugosidade 2", color = "Erro entre Pressão simulada e Pressão real")+
     ggtitle(str_c("Rugosidade 1:",i/1000))+
     ggsave(file=str_c(i,'.png'), path =str_c('./Documents/IC-2020/epanet_arquivos/grafico1/grafico_menor/'))
