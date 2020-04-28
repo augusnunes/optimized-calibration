@@ -9,7 +9,7 @@ for(i in 1:length(lista)){
   df %>% 
     ggplot(mapping = aes(x = r2, y = r3, color = erro_20_50_70))+
     geom_point()+
-    scale_color_gradientn(colours = rainbow(20))+
+    scale_color_gradientn(colours = rainbow(20), limit=c(0,4))+
     labs(x = "Rugosidade 2", y = "Rugosidade 3", color = "Erro entre Ps e Pr")+
     ggtitle(str_c("Rugosidade: ", as.double(rugosidade)/100))+
     ggsave(file=str_c(rugosidade,'.png'), path =str_c('./Documents/IC-2020/epanet_arquivos/c-town/grafico2/graficos/rainbow/'))

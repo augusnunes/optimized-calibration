@@ -1,8 +1,5 @@
 library(tidyverse)
 
-
-data("domestic_violence")
-
 for(i in 1:200){
   df = read_csv(str_c('./Documents/IC-2020/epanet_arquivos/c-town/grafico1/dados/',i,'.csv'))
   df['erro_20_30_50_60_70'] = (df['erro_20']+df['erro_30']+df['erro_50']+df['erro_60'] + df['erro_70'])/9
