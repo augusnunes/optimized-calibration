@@ -64,7 +64,7 @@ import epamodule
 
 Observe que utilizando a importação desta maneira, você terá de adicionar esse caminho no inicio de todo código que for utilizar o módulo.
 
-## Link simbólico
+### Link simbólico
 Outra opção é criar um link simbólico em algum diretório já listado no `sys.path`. Assim, você poderá chamar o módulo sem ter que adicionar ao `sys.path`.
 
 ~~~ shell
