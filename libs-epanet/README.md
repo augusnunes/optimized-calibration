@@ -1,7 +1,7 @@
 # Tutorial instalação Wrapper e EPANET - OpenWatterAnalytics
 
 ## Baixar arquivos e compilar
-Baixe os arquivos da biblioteca do EPANET em C/C++ [nesse link](https://github.com/OpenWaterAnalytics/EPANET/). Navegue até os arquivos e faz um build com Cmake.
+Baixe os arquivos da biblioteca do EPANET em C [nesse link](https://github.com/OpenWaterAnalytics/EPANET/). Navegue até os arquivos e faz um build com Cmake.
 
 ```
 git clone https://github.com/OpenWaterAnalytics/EPANET/
@@ -18,7 +18,7 @@ O arquivo da biblioteca estará em `./include/epanet2_2.h`. Se quiser você pode
 #include "epanet2_2.h"
 ~~~
 
-Tente compilar o arquivo usando `gcc teste.cpp -o exec`. Se compilar, então quer dizer que está funcionando para a linguagem C/C++.
+Tente compilar o arquivo usando `gcc teste.cpp -o exec`. Se compilar, então quer dizer que está funcionando para a linguagem C.
 
 Verifique se o arquivo `./build/lib/libepanet2.so` foi gerado. 
 
