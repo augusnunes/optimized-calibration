@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/epanet2.h
+epanet2_enums.h
+../include/epanet2_enums.h
+
+../include/epanet2_enums.h
+
+/home/augusto/Documents/EPANET/run/main.c
+stdio.h
+-
+epanet2.h
+/home/augusto/Documents/EPANET/run/epanet2.h
+

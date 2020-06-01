@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/runepanet.dir/main.c.o  -o ../bin/runepanet -Wl,-rpath,/home/augusto/Documents/EPANET/build/lib ../lib/libepanet2.so -lm 

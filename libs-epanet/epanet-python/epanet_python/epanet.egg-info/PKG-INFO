@@ -1,0 +1,11 @@
+Metadata-Version: 1.1
+Name: epanet
+Version: 0.3.0.dev1
+Summary: epanet_python - SWIG generated python wrappers for epanet libraries
+Home-page: UNKNOWN
+Author: Michael Tryby
+Author-email: Michael Tryby@epa.gov
+License: CC0
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Private :: Do Not Upload to pypi server

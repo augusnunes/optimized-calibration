@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC   -shared -Wl,-soname,libepanet-output.so -o ../../lib/libepanet-output.so CMakeFiles/epanet-output.dir/src/epanet_output.c.o CMakeFiles/epanet-output.dir/__/util/errormanager.c.o CMakeFiles/epanet-output.dir/__/util/filemanager.c.o CMakeFiles/epanet-output.dir/__/util/cstr_helper.c.o 

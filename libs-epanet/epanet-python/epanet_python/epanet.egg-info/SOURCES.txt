@@ -1,0 +1,6 @@
+setup.cfg
+setup.py
+epanet.egg-info/PKG-INFO
+epanet.egg-info/SOURCES.txt
+epanet.egg-info/dependency_links.txt
+epanet.egg-info/top_level.txt

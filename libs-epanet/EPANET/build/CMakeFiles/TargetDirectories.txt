@@ -1,0 +1,9 @@
+/home/augusto/Documents/EPANET/build/CMakeFiles/rebuild_cache.dir
+/home/augusto/Documents/EPANET/build/CMakeFiles/edit_cache.dir
+/home/augusto/Documents/EPANET/build/CMakeFiles/epanet2.dir
+/home/augusto/Documents/EPANET/build/run/CMakeFiles/rebuild_cache.dir
+/home/augusto/Documents/EPANET/build/run/CMakeFiles/edit_cache.dir
+/home/augusto/Documents/EPANET/build/run/CMakeFiles/runepanet.dir
+/home/augusto/Documents/EPANET/build/src/outfile/CMakeFiles/rebuild_cache.dir
+/home/augusto/Documents/EPANET/build/src/outfile/CMakeFiles/edit_cache.dir
+/home/augusto/Documents/EPANET/build/src/outfile/CMakeFiles/epanet-output.dir
