@@ -1,6 +1,3 @@
-import sys 
-sys.path.append('/home/augusto/Documents/epanet-python/epanet-module')
-
 import epamodule as em
 import numpy as np 
 
@@ -23,7 +20,7 @@ n11 = 34.24
 n15 = 31.88
 
 # lendo arquivo que contem a rede e abrindo sistema de análise hidráulica
-em.ENopen("/home/augusto/Documents/IC-2020/epanet_arquivos/rede/teste21.inp")
+em.ENopen("../../../networks/b-town/teste21.inp")
 em.ENopenH()
 
 

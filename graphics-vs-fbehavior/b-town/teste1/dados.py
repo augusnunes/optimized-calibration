@@ -1,6 +1,3 @@
-import sys 
-sys.path.append('/home/augusto/Documents/epanet-python/epanet-module')
-
 import epamodule as em
 import numpy as np 
 
@@ -12,7 +9,7 @@ def mudaRugosidade(grupo, rugosidade):
         em.ENsetlinkvalue(linkindex, em.EN_ROUGHNESS, rugosidade)
 
 def printaResultados(R1, R2, R3, erro):
-    arq = open("dados.csv", 'a')
+    arq = open("./dados/dados.csv", 'a')
     arq.write(str(R1)+","+str(R2)+","+str(R3)+","+str(erro)+"\n")
     arq.close()
 
@@ -26,11 +23,11 @@ n15 = 31.88
 
 
 # lendo arquivo que contem a rede e abrindo sistema de análise hidráulica
-em.ENopen("/home/augusto/Documents/IC-2020/epanet_arquivos/grafico1/rede.inp")
+em.ENopen("../../../networks/b-town/teste21.inp")
 em.ENopenH()
 
 # Criando arquivo 
-arq = open("dados.csv", 'w')
+arq = open("./dados/dados.csv", 'w')
 arq.write("Rg1,Rg2,Rg3,Erro\n")
 arq.close()
 
@@ -49,8 +46,6 @@ for i in v:
             em.ENsolveH()
             erro = 1/3*(np.abs(n6-em.ENgetnodevalue(em.ENgetnodeindex("6"), em.EN_PRESSURE)) + np.abs(n11-em.ENgetnodevalue(em.ENgetnodeindex("11"), em.EN_PRESSURE)) + np.abs(n15 - em.ENgetnodevalue(em.ENgetnodeindex("15"), em.EN_PRESSURE)))
             printaResultados(i, j, k, round(erro,5))
-
-
 
 em.ENcloseH()
 em.ENclose()
