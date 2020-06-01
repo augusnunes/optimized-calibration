@@ -16,6 +16,6 @@ function openH()
     sym = Libdl.dlsym(lib, :EN_openH)
 end
 
-using CBinding
+#using CBinding
 
 lib2 = Clibrary(path_epanet)
