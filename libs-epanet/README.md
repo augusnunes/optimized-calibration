@@ -1,5 +1,6 @@
 # Tutorial instalação Wrapper e EPANET - OpenWatterAnalytics
 
+## Baixar arquivos e compilar
 Baixe os arquivos da biblioteca do EPANET em C/C++ [nesse link](https://github.com/OpenWaterAnalytics/EPANET/). Navegue até os arquivos e faz um build com Cmake.
 
 ```
@@ -43,33 +44,34 @@ if _plat=='Linux':
   _lib = ctypes.CDLL("/home/$user/EPANET/build/lib/libepanet2.so")
 ~~~
 
-Depois disso, você poderá chamar o wrapper com:
+## Chamando o wrapper no código
+
+Depois de baixar e escolher uma pasta fixa para deixar esses arquivos, você poderá escolher dois meios de chamar o wrapper.
+
+### sys.path
+Você pode adicionar o caminho do `epamodule.py` ao sys.path da seguinte maneira:
+
+~~~ python
+import sys
+sys.path.append('/caminho/do/modulo/epanet-python/epanet-module/')
+~~~
+
+Depois disso, basta chamar o módulo assim:
 
 ~~~ python
 import epamodule
 ~~~
 
-Observe que você terá que estar na mesma pasta que este arquivo. O arquivo se localiza em `epanet-python/epanet-module/epamodule.py`. Você pode executar seu código em qualquer diretório, desde que adicione o caminho dele em `sys.path` no inicio do código.
+Observe que utilizando a importação desta maneira, você terá de adicionar esse caminho no inicio de todo código que for utilizar o módulo.
 
-~~~ python
-import sys
-sys.path.append('/home/$user/.../epanet-python/epanet-module/')
-~~~
+## Link simbólico
+Outra opção é criar um link simbólico em algum diretório já listado no `sys.path`. Assim, você poderá chamar o módulo sem ter que adicionar ao `sys.path`.
 
-Deve haver outras maneiras de evitar essa chamada, e tornar as coisas mais simples. Exemplo a seguir:
-
-~~~ python
-import sys
-sys.path.append('/home/augusto/Documents/epanet-python/epanet-module/')
-
-import epamodule as em
-em.ENopen("/home/augusto/Documents/epanet_arquivos/teste21.inp")
-~~~
-
-Outra opção é usar esses comandos:
-
-~~~
+~~~ shell
+# Terminal
 ln -s /caminho/do/arquivo/epanet-python/epanet-module/epamodule ~/.local/lib/pythonX.Y/site-packages/epamodule
 ~~~
 
-Assim, você poderá chamar o modulo sem ter que adicionar ao `sys.path`
+~~~ python
+import epamodule
+~~~
