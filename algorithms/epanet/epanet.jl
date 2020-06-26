@@ -19,10 +19,11 @@ struct Network
     valores_reais::Dict{Float64, Dict{Int64, Float64}} # Dict{vazao, Dict{id_node, vazao}}
     function Network(p::Paths, numero_grupos::Int64, 
         #target_nodes::Dict{Int64, Float64}, 
-        #lista_vazao::Array{Float64}
+        #lista_vazao::Array{Float64},
+        group_link::Dict{Int64, Array{Int64,1}},
         valores_reais::Dict{Float64, Dict{Int64, Float64}})
         all_nodes = get_nodes(p.nodes)
-        group_link = get_links(p.links, numero_grupos)
+        #group_link = get_links(p.links, numero_grupos)
         #valores_reais= get_real_values(lista_vazao, target_nodes, all_nodes, group_link )
         new(all_nodes, group_link, valores_reais)
     end
@@ -34,14 +35,24 @@ mutable struct Simulation
     link_values::Dict{Int64, Float64} #In-time values of network # Dict {id do grupo, rugosidade}
 
 end
-
+#=
 function cria_saida(s::Paths)
     println("Criando arquivo de saída")
-    arq = open(string(s.saida,"dados.csv"),"w")
+    arq = open(s.saida,"w")
     write(arq, "i,rn,derivada,delta,r2,r3,r1,erro\n")
     close(arq)
     println("Criado arquivo de saída")
 end
+=#
+
+function cria_saida(s::Paths)
+    println("Criando arquivo de saída")
+    arq = open(s.saida,"w")
+    write(arq, "rugosidade,erro\n")
+    close(arq)
+    println("Criado arquivo de saída")
+end
+
 
 function start(s::Paths)
     em.ENopen(s.inp)
@@ -153,7 +164,7 @@ function simula(net::Network, new_rugo::Float64, numero_grupo::Int64)::Float64
         reverte_vazao.(net.all_nodes,i)
     end
     #dados |> println
-    return dados/9
+    return dados/(3*6)
 end
 
 
