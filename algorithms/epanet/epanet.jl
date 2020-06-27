@@ -164,7 +164,7 @@ function simula(net::Network, new_rugo::Float64, numero_grupo::Int64)::Float64
         reverte_vazao.(net.all_nodes,i)
     end
     #dados |> println
-    return dados/(3*6)
+    return dados/(3*8)
 end
 
 
@@ -179,7 +179,7 @@ function calcula_derivada(net::Network, rugosidade::Float64, numero_grupo::Int64
     # f(x)-f(x+h)
     #      h
     #"calculando derivada" |> println
-    h = 0.001
+    h = 0.0001
     return (f(net, rugosidade,numero_grupo)-f(net, rugosidade + h, numero_grupo))/h
     
 end
@@ -188,7 +188,7 @@ end
 function calcula_derivada_segunda(net::Network, rugosidade::Float64, numero_grupo::Int64)
     # f(x+h)+f(x)+f(x-h)
     #        h^2
-    h = 0.001
+    h = 0.0001
     #"calculando segunda derivada" |> println
     #return (f(net,rugosidade+2*h,numero_grupo)-2*f(net, rugosidade+h,numero_grupo)+f(net, rugosidade,numero_grupo))/h^2
     return (calcula_derivada(net, rugosidade,numero_grupo)-calcula_derivada(net,rugosidade+h,numero_grupo))/h

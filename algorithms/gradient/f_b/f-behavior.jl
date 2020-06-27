@@ -6,19 +6,17 @@ em = Main.epamodule
 include("/home/augusto/Documents/IC-2020/optimized-calibration/algorithms/epanet/epanet.jl")
 sm = Main.simulation
 
-function printa_dados(i, numero_grupo, derivada, delta, r, erro)
-    s = string(i, ",", numero_grupo, ",", derivada, ",", delta, ",")
-    for i in keys(r)
-        s *= string(r[i],",")
-    end
-    s *= string(erro,"\n")
-    arq = open("/home/augusto/Documents/IC-2020/optimized-calibration/gradient-teste/teste2/dados.csv","a")
+function printa_dados(path, i, erro)
+    s = string(i, ",", erro, "\n")
+    arq = open(path.saida,"a")
+    println(s)
     write(arq,s)
     close(arq)
 end
 
 
-function gradient(
+
+function behavior(
     path_nodes::String,
     path_links::String,
     path_inp::String,
@@ -32,32 +30,18 @@ function gradient(
     println("Iniciando simulação")
     sm.start(paths)
     println("Iniciando network")
-    net = sm.Network(paths, 3, values)
-    a = 0.9
-    b = 0.079
+    group_link = Dict{Int64, Array{Int64,1}}(1 => em.ENgetlinkindex.(["2","3","15","14","13","12","11","10","1"]), 2=>em.ENgetlinkindex.(["16","17","18","19","20"]), 3=> em.ENgetlinkindex.(["5","4","6","7","8","9"]))
+    net = sm.Network(paths, 3, group_link, values)
+    a = 0.01
+    b = 0.001
     c = 0.115
     intime_smvalues = sm.Simulation(Dict{Int64,Float64}(1 => a, 2=>b, 3 => c)) 
     sm.update_network_values(net,intime_smvalues)
     sm.cria_saida(paths)
-    interacao = 1
-    
-    #for i in 1:1:3
-    i = 1
-        ∂f = sm.calcula_derivada(net, intime_smvalues.link_values[i], i)
-        while abs(∂f) > 0.000001
-            ∂f = sm.calcula_derivada(net, intime_smvalues.link_values[i], i)
-            ∂f² = sm.calcula_derivada_segunda(net, intime_smvalues.link_values[i],i)
-            Δ = ∂f/abs(∂f²)
-            intime_smvalues.link_values[i] -= Δ
-            if ! (0.001 <= intime_smvalues.link_values[i] <= 0.2)
-                break
-            end
-            println("$(intime_smvalues.link_values[i]) \t $(∂f) \t $(∂f²) \t $Δ \t $(sm.simula(net, intime_smvalues.link_values[i], i))")
-            printa_dados(Int(ceil(interacao/3)), i, ∂f,Δ, intime_smvalues.link_values, sm.simula(net, intime_smvalues.link_values[i], i))
-            # interacao += 1
-        end
-        
-    #end # end loop gradient
+    for i in 0.000001:0.000001:0.2
+        erro = sm.simula(net, i, 1)
+        printa_dados(paths, i, erro)
+    end
     sm.close_sim()
 end # end func gradient
 
@@ -67,11 +51,11 @@ values = Dict{Float64, Dict{Int64, Float64}}(20.0 => Dict(6 =>26.434926986694336
     55.0 => Dict(6 =>24.47783660888672, 11 => 33.25362014770508, 15 => 29.47846031188965 ),
     60.0 => Dict(6 =>24.071619033813477,11 => 33.03902816772461, 15 => 28.954042434692383),
     70.0 => Dict(6 =>23.16685676574707, 11 => 32.56293487548828, 15 => 27.788007736206055))  
-
-gradient(
+9
+behavior(
     "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/nodes",
     "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/links",
     "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/rede.inp",
-    "/home/augusto/Documents/IC-2020/optimized-calibration/gradient-teste/teste2/",
+    "/home/augusto/Documents/IC-2020/optimized-calibration/gradient/f_b/rugo_1/errado.csv",
     values
 )
