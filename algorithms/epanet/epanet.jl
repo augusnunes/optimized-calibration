@@ -35,24 +35,6 @@ mutable struct Simulation
     link_values::Dict{Int64, Float64} #In-time values of network # Dict {id do grupo, rugosidade}
 
 end
-#=
-function cria_saida(s::Paths)
-    println("Criando arquivo de saída")
-    arq = open(s.saida,"w")
-    write(arq, "i,rn,derivada,delta,r2,r3,r1,erro\n")
-    close(arq)
-    println("Criado arquivo de saída")
-end
-=#
-
-function cria_saida(s::Paths)
-    println("Criando arquivo de saída")
-    arq = open(s.saida,"w")
-    write(arq, "rugosidade,erro\n")
-    close(arq)
-    println("Criado arquivo de saída")
-end
-
 
 function start(s::Paths)
     em.ENopen(s.inp)
@@ -142,15 +124,6 @@ function get_real_values(
 end
 =#
 
-#=
-#################################
-----------------Rever sintaxe--------------
-#################################
-=#
-
-function get_node_pressure(node::Int64)::Float64
-    return em.ENgetnodevalue(node, em.EN_PRESSURE)
-end
 
 function simula(net::Network, new_rugo::Float64, numero_grupo::Int64)::Float64
     muda_rugosidade.(net.group_link[numero_grupo], new_rugo)
@@ -159,29 +132,28 @@ function simula(net::Network, new_rugo::Float64, numero_grupo::Int64)::Float64
         muda_vazao.(net.all_nodes, i)
         em.ENsolveH()
         for j in keys(net.valores_reais[i])
-            dados += abs(net.valores_reais[i][j]-get_node_pressure(j))
+            dados += abs(net.valores_reais[i][j]-em.ENgetnodevalue(j, em.EN_PRESSURE))
         end
         reverte_vazao.(net.all_nodes,i)
     end
     #dados |> println
-    return dados/(3*8)
+    return round(dados/(3*6),digits=6)
 end
 
 
 function f(net::Network, rugosidade::Float64, numero_grupo::Int64)::Float64
-    a = simula(net, rugosidade, numero_grupo)
+    #a = simula(net, rugosidade, numero_grupo)
     #a |> println 
-    return a
+    return simula(net, rugosidade, numero_grupo)
 end
 
 
 function calcula_derivada(net::Network, rugosidade::Float64, numero_grupo::Int64)
-    # f(x)-f(x+h)
+    # f'(x)-f'(x-h)
     #      h
     #"calculando derivada" |> println
     h = 0.0001
-    return (f(net, rugosidade,numero_grupo)-f(net, rugosidade + h, numero_grupo))/h
-    
+    return (f(net, rugosidade,numero_grupo)-f(net, rugosidade-h, numero_grupo))
 end
 
 
@@ -191,7 +163,7 @@ function calcula_derivada_segunda(net::Network, rugosidade::Float64, numero_grup
     h = 0.0001
     #"calculando segunda derivada" |> println
     #return (f(net,rugosidade+2*h,numero_grupo)-2*f(net, rugosidade+h,numero_grupo)+f(net, rugosidade,numero_grupo))/h^2
-    return (calcula_derivada(net, rugosidade,numero_grupo)-calcula_derivada(net,rugosidade+h,numero_grupo))/h
+    return (calcula_derivada(net, rugosidade,numero_grupo)-calcula_derivada(net,rugosidade-h,numero_grupo))/h
 end
 
 

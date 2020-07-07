@@ -17,6 +17,13 @@ function printa_dados(paths, i, numero_grupo, derivada, delta, r, erro)
     close(arq)
 end
 
+function cria_saida(s)
+    println("Criando arquivo de saída")
+    arq = open(s.saida,"w")
+    write(arq, "i,rn,derivada,delta,r2,r3,r1,erro\n")
+    close(arq)
+    println("Criado arquivo de saída")
+end
 
 function gradient(
     path_nodes::String,
@@ -34,23 +41,23 @@ function gradient(
     println("Iniciando network")
     group_link = Dict{Int64, Array{Int64,1}}(1 => em.ENgetlinkindex.(["2","3","15","14","13","12","11","10","1"]), 2=>em.ENgetlinkindex.(["16","17","18","19","20"]), 3=> em.ENgetlinkindex.(["5","4","6","7","8","9"]))
     net = sm.Network(paths, 3, group_link, values)
-    a = 0.001
-    b = 0.079
+    a = 0.2
+    b = 0.001
     c = 0.115
     intime_smvalues = sm.Simulation(Dict{Int64,Float64}(1 => a, 2=>b, 3 => c)) 
     sm.update_network_values(net,intime_smvalues)
-    sm.cria_saida(paths)
+    cria_saida(paths)
     interacao = 1
     
     #for i in 1:1:3
     i = 1
         ∂f = sm.calcula_derivada(net, intime_smvalues.link_values[i], i)
-        while abs(∂f) > 0.000001
+        while abs(∂f) > 0.0001
             ∂f = sm.calcula_derivada(net, intime_smvalues.link_values[i], i)
             ∂f² = sm.calcula_derivada_segunda(net, intime_smvalues.link_values[i],i)
             Δ = ∂f/abs(∂f²)
-            intime_smvalues.link_values[i] -= Δ
             println("$(intime_smvalues.link_values[i]) \t $(∂f) \t $(∂f²) \t $Δ \t $(sm.simula(net, intime_smvalues.link_values[i], i))")
+            intime_smvalues.link_values[i] -= Δ
             printa_dados(paths, Int(ceil(interacao/3)), i, ∂f,Δ, intime_smvalues.link_values, sm.simula(net, intime_smvalues.link_values[i], i))
             # interacao += 1
         end
@@ -70,6 +77,6 @@ gradient(
     "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/nodes",
     "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/links",
     "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/rede.inp",
-    "/home/augusto/Documents/IC-2020/optimized-calibration/gradient/testes/2/dados.csv",
+    "/home/augusto/Documents/IC-2020/optimized-calibration/algorithms/gradient/testes/1/dados7.csv",
     values
 )
