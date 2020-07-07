@@ -1,203 +1,82 @@
-# importing 
-using PyCall
-em = pyimport("epamodule")
+# Including epamodule.jl
+include("/home/augusto/Documents/IC-2020/epanet-julia/epamodule.jl")
+em = Main.epamodule
 
-# Declaring variables
-global v = 1
-global rede = "../../redes/c-town/C-Town.inp"
-global path_nodes = "../../redes/c-town/nodes"
-global path_links = "../../redes/c-town/links"
-global nodes = []
-global links = Dict()
-global valores_reais = Array{Float64,2}(undef,6,11)
-global lista_nodes = ["J175" "J188" "J6" "J242" "J280" "J323" "J17" "J239" "J77" "J38"]
-global rugosidades = [0.073  0.023  0.082  0.065  0.008  0.046  0.098  0.004  0.053  0.094]
+#Including epanet.jl
+include("/home/augusto/Documents/IC-2020/optimized-calibration/algorithms/epanet/epanet.jl")
+sm = Main.simulation
 
-function cria_arquivo()
-    saida = "./teste"*string(v)*"/dados.csv"
-    arq = open(saida,"w")
-    write(arq, "i,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,erro\n")
-    close(arq)
-end
-
-function muda_vazao(node::String, valor::Float64)
-    index = em.ENgetnodeindex(node)
-    em.ENsetnodevalue(index, em.EN_BASEDEMAND, em.ENgetnodevalue(index, em.EN_BASEDEMAND)*valor)
-end
-
-function reverte_vazao(node::String, valor::Float64)
-    index = em.ENgetnodeindex(node)
-    em.ENsetnodevalue(index, em.EN_BASEDEMAND, em.ENgetnodevalue(index, em.EN_BASEDEMAND)/valor)
-end
-
-function muda_rugosidade(link, r)
-    linkindex = em.ENgetlinkindex(link)
-    em.ENsetlinkvalue(linkindex, em.EN_ROUGHNESS, r)
-end
-
-function get_nodes(path::String)
-    arq = open(path)
-    nodes = string.(split(read(arq,String),"\n"))
-end
-
-function get_links(n_grupos::Int64)
-    s_links = string.(vec(split(read(open(path_links),String),"\n")))
-    tamanho = Int(round(length(s_links)/n_grupos))
-    l_start = 1
-    l_end = tamanho
-    count = 1
-    while length(s_links) >= l_end
-        if (length(s_links)-l_end) < tamanho
-            links["g"*string(count)] = s_links[l_start:l_end] 
-            links["g"*string(count+1)] = s_links[l_start+tamanho:length(s_links)] 
-            println(string(count+1))
-            break;
-        end
-        links["g"*string(count)] = s_links[l_start:l_end] 
-        l_start += tamanho
-        l_end += tamanho
-        count += 1 
-        
+function printa_dados(paths, i, numero_grupo, derivada, delta, r, erro)
+    s = string(i, ",", numero_grupo, ",", derivada, ",", delta, ",")
+    for i in keys(r)
+        s *= string(r[i],",")
     end
-end
-
-function get_node_pressure(node)
-    return em.ENgetnodevalue(em.ENgetnodeindex(node), em.EN_PRESSURE)
-end
-
-function pega_dados_reais()
-    lista_vazao = [20.0 30.0 40.0 50.0 60.0 70.0]
-    lista_rugosidade = [0.04 0.094 0.07 0.079 0.048 0.039 0.027 0.042 0.047 0.004]
-    for i in 1:10
-        muda_rugosidade.(links["g"*string(i)], lista_rugosidade[i])
-    end
-    for i in 1:length(lista_vazao)
-        valores_reais[i,1] = lista_vazao[i]
-        muda_vazao.(nodes, lista_vazao[i])
-        em.ENsolveH()
-        for j in 1:10
-            valores_reais[i,j+1] = get_node_pressure(lista_nodes[j])
-        end
-        reverte_vazao.(nodes, lista_vazao[i])
-
-    end
-    arq = open("./teste1/dados_reais.csv","w")
-    write(arq, string(valores_reais))
-    println(valores_reais)
-    close(arq)
-end
-
-function inicia_simulacao()
-    em.ENopen(rede)
-    em.ENopenH()
-end
-
-function para_simulacao()
-    em.ENcloseH()
-    em.ENclose()
-end
-
-#= Links úteis para bibliotecas de gradient descent
-- https://github.com/lindahua/SGDOptim.jl
-- 
-
-=#
-## Funções referentes ao método
-
-function simula()
-    dados::Float64 = 0.0
-    for i in 1:6
-        muda_vazao.(nodes, valores_reais[i,1])
-        em.ENsolveH()
-        for j in 1:10
-            dados += abs(valores_reais[i,j+1]-get_node_pressure(lista_nodes[j]))
-        end
-        reverte_vazao.(nodes,valores_reais[i,1])
-    end
-
-    return dados/60
-end
-
-function muda_rugosidade_grupos(r)
-    for i in 1:10
-        muda_rugosidade.(links["g"*string(i)], r[i])
-    end
-end
-
-function f(rugosidade, numero_grupo)
-    r = rugosidades
-    r[numero_grupo] = rugosidade
-    muda_rugosidade_grupos(r)
-    return simula()
-end
-
-function calcula_derivada(rugosidade, numero_grupo)
-    # f(x)-f(x+h)
-    #      h
-    h = 0.001
-    return (f(rugosidade,numero_grupo)-f(rugosidade - h, numero_grupo))/h
-    
-end
-
-
-function calcula_derivada_segunda(rugosidade,numero_grupo)
-    # f(x+h)+f(x)+f(x-h)
-    #        h^2
-    h = 0.001
-    return (f(rugosidade+h,numero_grupo)+f(rugosidade,numero_grupo)+f(rugosidade-h,numero_grupo))/h^2
-end
-
-
-
-function gradient()
-    #for i in 1:6
-    #    println("Teste número: "*string(i))
-    Δ = 1
-    interacao = 1
-    while abs(Δ) > 1e-11
-        println("Interação: "*string(interacao))
-        for i in 1:10
-            ∂f = calcula_derivada(rugosidades[i], i)
-            Δ = ∂f/calcula_derivada_segunda(rugosidades[i],i)
-            
-            if abs(Δ) > 1e-6
-                if ∂f > 0
-                    rugosidades[i]+=abs(Δ)*0.0001
-                elseif ∂f < 0
-                    rugosidades[i]-=abs(Δ)*0.0001
-                end
-            end
-            muda_rugosidade_grupos(rugosidades)
-            printa_dados(interacao, i, ∂f,Δ, rugosidades, simula())
-        end
-        interacao += 1
-    end
-    #end
-end
-
-function printa_dados(i, numero_grupo, derivada1,delta, r, erro)
-    s = string(i)*","*string(numero_grupo)*","*string(derivada1)*","*string(delta)*","
-    for i in r
-        s *= string(i)*","
-    end
-    s *= string(erro)*"\n"
-    arq = open("./teste1/dados/dados.csv","a")
+    s *= string(erro,"\n")
+    arq = open(paths.saida,"a")
     write(arq,s)
     close(arq)
 end
 
+function cria_saida(s)
+    println("Criando arquivo de saída")
+    arq = open(s.saida,"w")
+    write(arq, "i,rn,derivada,delta,r2,r3,r1,erro\n")
+    close(arq)
+    println("Criado arquivo de saída")
+end
 
+function gradient(
+    path_nodes::String,
+    path_links::String,
+    path_inp::String,
+    path_saida::String,
+    #lista_vazao::Array{Float64},
+    #lista_rugosidade_real::Array{Float64},
+    values::Dict{Float64, Dict{Int64, Float64}}
+)
+    println("Iniciando struct paths")
+    paths = sm.Paths(path_nodes, path_links, path_inp, path_saida)
+    println("Iniciando simulação")
+    sm.start(paths)
+    println("Iniciando network")
+    group_link = Dict{Int64, Array{Int64,1}}(1 => em.ENgetlinkindex.(["2","3","15","14","13","12","11","10","1"]), 2=>em.ENgetlinkindex.(["16","17","18","19","20"]), 3=> em.ENgetlinkindex.(["5","4","6","7","8","9"]))
+    net = sm.Network(paths, 3, group_link, values)
+    a = 0.2
+    b = 0.001
+    c = 0.115
+    intime_smvalues = sm.Simulation(Dict{Int64,Float64}(1 => a, 2=>b, 3 => c)) 
+    sm.update_network_values(net,intime_smvalues)
+    cria_saida(paths)
+    interacao = 1
+    
+    #for i in 1:1:3
+    i = 1
+        ∂f = sm.calcula_derivada(net, intime_smvalues.link_values[i], i)
+        while abs(∂f) > 0.0001
+            ∂f = sm.calcula_derivada(net, intime_smvalues.link_values[i], i)
+            ∂f² = sm.calcula_derivada_segunda(net, intime_smvalues.link_values[i],i)
+            Δ = ∂f/abs(∂f²)
+            println("$(intime_smvalues.link_values[i]) \t $(∂f) \t $(∂f²) \t $Δ \t $(sm.simula(net, intime_smvalues.link_values[i], i))")
+            intime_smvalues.link_values[i] -= Δ
+            printa_dados(paths, Int(ceil(interacao/3)), i, ∂f,Δ, intime_smvalues.link_values, sm.simula(net, intime_smvalues.link_values[i], i))
+            # interacao += 1
+        end
+        
+    #end # end loop gradient
+    sm.close_sim()
+end # end func gradient
 
-println("Iniciando Simulação")
-inicia_simulacao()
-println("Pegando valores da rede")
-get_nodes(path_nodes)
-get_links(10) # 10 grupos de rugosidade
-println("Criando Arquivo")
-cria_arquivo()
-println("Pegando dados de pressão nos nós")
-pega_dados_reais()
-println("Iniciando método gradiente")
-gradient()
-println("Encerrando Simulação")
-para_simulacao()
+values = Dict{Float64, Dict{Int64, Float64}}(20.0 => Dict(6 =>26.434926986694336,11 => 34.299713134765625,15 => 32.01907730102539), 
+    30.0 => Dict(6 =>26.037752151489258,11 => 34.08491516113281, 15 => 31.50044059753418), 
+    50.0 => Dict(6 =>24.853008270263672,11 => 33.45237731933594, 15 => 29.963409423828125 ), 
+    55.0 => Dict(6 =>24.47783660888672, 11 => 33.25362014770508, 15 => 29.47846031188965 ),
+    60.0 => Dict(6 =>24.071619033813477,11 => 33.03902816772461, 15 => 28.954042434692383),
+    70.0 => Dict(6 =>23.16685676574707, 11 => 32.56293487548828, 15 => 27.788007736206055))  
+
+gradient(
+    "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/nodes",
+    "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/links",
+    "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/rede.inp",
+    "/home/augusto/Documents/IC-2020/optimized-calibration/algorithms/gradient/testes/1/dados7.csv",
+    values
+)

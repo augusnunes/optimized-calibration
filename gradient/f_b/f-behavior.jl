@@ -33,19 +33,17 @@ function behavior(
     group_link = Dict{Int64, Array{Int64,1}}(1 => em.ENgetlinkindex.(["2","3","15","14","13","12","11","10","1"]), 2=>em.ENgetlinkindex.(["16","17","18","19","20"]), 3=> em.ENgetlinkindex.(["5","4","6","7","8","9"]))
     net = sm.Network(paths, 3, group_link, values)
     a = 0.01
-    b = 0.079
+    b = 0.001
     c = 0.115
     intime_smvalues = sm.Simulation(Dict{Int64,Float64}(1 => a, 2=>b, 3 => c)) 
     sm.update_network_values(net,intime_smvalues)
     sm.cria_saida(paths)
     for i in 0.000001:0.000001:0.2
-        erro = sm.simula(net, i, 3)
+        erro = sm.simula(net, i, 1)
         printa_dados(paths, i, erro)
     end
     sm.close_sim()
 end # end func gradient
-
-group_link = Dict{Int64, Array{Int64,1}}()
 
 values = Dict{Float64, Dict{Int64, Float64}}(20.0 => Dict(6 =>26.434926986694336,11 => 34.299713134765625,15 => 32.01907730102539), 
     30.0 => Dict(6 =>26.037752151489258,11 => 34.08491516113281, 15 => 31.50044059753418), 
@@ -58,6 +56,6 @@ behavior(
     "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/nodes",
     "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/links",
     "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/rede.inp",
-    "/home/augusto/Documents/IC-2020/optimized-calibration/gradient/f_b/rugo_3/dados.csv",
+    "/home/augusto/Documents/IC-2020/optimized-calibration/gradient/f_b/rugo_1/errado.csv",
     values
 )
