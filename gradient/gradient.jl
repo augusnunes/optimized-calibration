@@ -3,7 +3,7 @@ include("/home/augusto/Documents/IC-2020/epanet-julia/epamodule.jl")
 em = Main.epamodule
 
 #Including epanet.jl
-include("/home/augusto/Documents/IC-2020/optimized-calibration/algorithms/epanet/epanet.jl")
+include("/home/augusto/Documents/IC-2020/optimized-calibration/epanet/epanet.jl")
 sm = Main.simulation
 
 function printa_dados(paths, i, numero_grupo, derivada, delta, r, erro)
@@ -41,9 +41,9 @@ function gradient(
     println("Iniciando network")
     group_link = Dict{Int64, Array{Int64,1}}(1 => em.ENgetlinkindex.(["2","3","15","14","13","12","11","10","1"]), 2=>em.ENgetlinkindex.(["16","17","18","19","20"]), 3=> em.ENgetlinkindex.(["5","4","6","7","8","9"]))
     net = sm.Network(paths, 3, group_link, values)
-    a = 0.2
-    b = 0.001
-    c = 0.115
+    a = 0.001 # 0.01
+    b = 0.079 # 0.079
+    c = 0.115 # 0.115
     intime_smvalues = sm.Simulation(Dict{Int64,Float64}(1 => a, 2=>b, 3 => c)) 
     sm.update_network_values(net,intime_smvalues)
     cria_saida(paths)
@@ -52,7 +52,7 @@ function gradient(
     #for i in 1:1:3
     i = 1
         ∂f = sm.calcula_derivada(net, intime_smvalues.link_values[i], i)
-        while abs(∂f) > 0.0001
+        while abs(∂f) > 0.00001
             ∂f = sm.calcula_derivada(net, intime_smvalues.link_values[i], i)
             ∂f² = sm.calcula_derivada_segunda(net, intime_smvalues.link_values[i],i)
             Δ = ∂f/abs(∂f²)
@@ -77,6 +77,6 @@ gradient(
     "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/nodes",
     "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/links",
     "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/rede.inp",
-    "/home/augusto/Documents/IC-2020/optimized-calibration/algorithms/gradient/testes/1/dados7.csv",
+    "/home/augusto/Documents/IC-2020/optimized-calibration/gradient/testes/1/dados8.csv",
     values
 )

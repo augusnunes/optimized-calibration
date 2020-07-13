@@ -8,7 +8,8 @@ function gradient(f, x)
     variavel = x
     δf=f1(variavel)
     count = 0
-    while abs(δf) > 0
+    while abs(δf) > 0.001
+        println(variavel)
         δf=f1(variavel)
         Δ = δf/abs(f2(variavel))
         variavel -= Δ
@@ -17,7 +18,7 @@ function gradient(f, x)
     end
     return variavel
 end
-
+#=
 function f(x)
     a = x[1]^2 + x[2]^2
     return a
@@ -62,3 +63,7 @@ end
 #f2(x) = (f(x+2*h)-2*f(x+h)+f(x))/h^2
 #gradient_2d([500.0 3.0])
 gradient_2d([1.0 3.0]) |> println
+=#
+
+f(x) = -x^3 + 3*x
+gradient(f, 0)
