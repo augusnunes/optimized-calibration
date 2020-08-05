@@ -1,11 +1,12 @@
 # Module for run simulation
 module epanet
+
 # Including epamodule.jl
 include("/home/augusto/Documents/IC-2020/epanet-julia/epamodule.jl")
 em = Main.epamodule
 export Network
 
-
+# struct para controle de paths
 struct Paths
     nodes::String
     links::String
@@ -13,11 +14,11 @@ struct Paths
     saida::String
 end # end struct Paths
 
-
+# struct para controle de elementos e volores da rede
 struct Network
-    all_nodes::Array{Int64}
-    group_link::Dict{Int64, Array{Int64,1}}
-    valores_reais::Dict{Float64, Dict{Int64, Float64}} # Dict{vazao, Dict{id_node, vazao}}
+    all_nodes::Array{Int64} # todos os IDs dos nós
+    group_link::Dict{Int64, Array{Int64,1}} # armazena o grupo de tubulações e seus IDs
+    valores_reais::Dict{Float64, Dict{Int64, Float64}} # Dict{vazao, Dict{id_node, pressão}} # armazena os valores reais da rede
     function Network(p::Paths, numero_grupos::Int64, 
         #target_nodes::Dict{Int64, Float64}, 
         #lista_vazao::Array{Float64},
@@ -31,28 +32,31 @@ struct Network
     
 end
 
-
+# struct para controlar os valores das rugosidades dos grupos de tubulações
 mutable struct Simulation
     link_values::Dict{Int64, Float64} #In-time values of network # Dict {id do grupo, rugosidade}
-
 end
 
+# Função que começa simulação do epanet
 function start(s::Paths)
     em.ENopen(s.inp)
     em.ENopenH()
 end
 
+# Função que fecha simulação do epanet
 function close_sim()
     em.ENcloseH()
     em.ENclose()
 end
 
+# Função que lê arquivo dos nós e obtém os IDs de todos eles
 function get_nodes(path::String)::Array{Int64}
     arq = open(path)
     nodes = em.ENgetnodeindex.(string.(split(read(arq,String),"\n")))
     #nodes = read(arq,String) |> x -> read(x,"\n") |> split |> string. |> em.ENgetnodeindex.
 end
 
+# Função
 function get_links(path_links::String, n_grupos::Int64)::Dict{Int64, Array{Int64}}
     println("Pegando links")
     s_links = string.(vec(split(read(open(path_links),String),"\n")))
