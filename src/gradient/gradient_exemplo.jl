@@ -1,11 +1,11 @@
 
 
-function gradient(f, x)
+function gradient(f, ponto)
     h = 1e-3
     f1(x)=(f(x)-f(x-h))/h
     #f2(x)=(f1(x)-f1(x-h))/h
     f2(x) = (f(x+2*h)-2*f(x+h)+f(x))/h^2
-    variavel = x
+    variavel = ponto
     δf=f1(variavel)
     count = 0
     while abs(δf) > 0.001
@@ -66,4 +66,29 @@ gradient_2d([1.0 3.0]) |> println
 =#
 
 f(x) = -x^3 + 3*x
-gradient(f, 0)
+#gradient(f, 0)
+
+
+
+function gradient_v2(f, ponto)
+    h = 0.002
+    f1(x)=(f(x)-f(x-h))/h
+    #f2(x)=(f1(x)-f1(x-h))/h
+    f2(x) = (f(x+2*h)-2*f(x+h)+f(x))/h^2
+    variavel = ponto
+    δf=f1(variavel)
+    count = 0
+    while abs(δf) > 0.001
+        #println(variavel)
+        δf=f1(variavel)
+        Δ = δf*0.001
+        variavel -= Δ
+        println(string("x: ",variavel,"\t","δ: ",δf,"\t","Δ: ",Δ))
+        
+    end
+    return variavel
+end
+
+#gradient_v2(f, -4)
+g(x) = abs(x-1)
+gradient_v2(g, 0)

@@ -6,8 +6,8 @@ em = Main.epamodule
 include("/home/augusto/Documents/IC-2020/optimized-calibration/epanet/epanet.jl")
 sm = Main.simulation
 
-function printa_dados(path, i, erro)
-    s = string(i, ",", erro, "\n")
+function printa_dados(path, i, j, k, erro)
+    s = string(i, ",", j, ",", k, ",", erro, "\n")
     arq = open(path.saida,"a")
     println(s)
     write(arq,s)
@@ -17,7 +17,7 @@ end
 function cria_saida(s)
     println("Criando arquivo de saída")
     arq = open(s.saida,"w")
-    write(arq, "i,derivada\n")
+    write(arq, "r1,r2,r3,erro\n")
     close(arq)
     println("Criado arquivo de saída")
 end
@@ -39,15 +39,20 @@ function behavior(
     println("Iniciando network")
     group_link = Dict{Int64, Array{Int64,1}}(1 => em.ENgetlinkindex.(["2","3","15","14","13","12","11","10","1"]), 2=>em.ENgetlinkindex.(["16","17","18","19","20"]), 3=> em.ENgetlinkindex.(["5","4","6","7","8","9"]))
     net = sm.Network(paths, 3, group_link, values)
-    a = 0.01 # 0.01
-    b = 0.079 # 0.079
-    c = 0.115 # 0.115
+    a = 0.001 # 0.01
+    b = 0.040 # 0.079
+    c = 0.001 # 0.115
     intime_smvalues = sm.Simulation(Dict{Int64,Float64}(1 => a, 2=>b, 3 => c)) 
     sm.update_network_values(net,intime_smvalues)
     cria_saida(paths)
-    for i in 0.001:0.001:0.2
-        derivada = sm.calcula_derivada(net, i, 3)
-        printa_dados(paths, i, derivada)
+    intervalo = 0.001:0.001:0.2
+    for i in intervalo, j in intervalo, k in intervalo
+        intime_smvalues.link_values[1] = i
+        intime_smvalues.link_values[2] = j
+        sm.update_network_values(net,intime_smvalues)
+        #derivada = sm.calcula_derivada(net, i, 1)
+        derivada = sm.f(net, k, 3)
+        printa_dados(paths, i, j, k, derivada)
     end
     sm.close_sim()
 end # end func gradient
@@ -65,6 +70,6 @@ behavior(
     "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/nodes",
     "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/links",
     "/home/augusto/Documents/IC-2020/optimized-calibration/networks/b-town/rede.inp",
-    "/home/augusto/Documents/IC-2020/optimized-calibration/gradient/f_b/other/round_5/4_casas/derivada3.csv",
+    "/home/augusto/Documents/IC-2020/optimized-calibration/gradient/f_b/geral/f.csv",
     values
 )
