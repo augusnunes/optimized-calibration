@@ -1,25 +1,27 @@
 module derivative
 
-# Incluindo módulo para chamar função objetivo
+# Incluindo módulo epanet
 include("../epanet/epanet.jl")
 epa = Main.epanet
 
-function calcula_derivada(net::Network, rugosidade::Float64, numero_grupo::Int64)
-    # f(x)-f(x-h)
-    #      h
-    #"calculando derivada" |> println
+function calcula_derivada(net, rugosidade::Float64, numero_grupo::Int64)
     h = 0.0001
     value = 0
+    # f(x)-f(x-h)
+    #      h
     value += (epa.f(net, rugosidade, numero_grupo) - epa.f(net,rugosidade-h, numero_grupo))/h
+    # f(x+h)-f(x)
+    #      h
     value += (epa.f(net, rugosidade+h, numero_grupo) - epa.f(net, rugosidade, numero_grupo))/h
+    # f(x+h)-f(x-h)
+    #      2h
     value += (epa.f(net, rugosidade+h, numero_grupo) - epa.f(net, rugosidade-h, numero_grupo))/(h*2)
     return value/3
-    #return value
-
+    
 end
 
 
-function calcula_derivada_segunda(net::Network, rugosidade::Float64, numero_grupo::Int64)
+function calcula_derivada_segunda(net, rugosidade::Float64, numero_grupo::Int64)
     # f'(x)-f'(x-h)
     #     h
     h = 0.0001

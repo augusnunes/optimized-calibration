@@ -4,7 +4,7 @@ Julia EpanetToolkit
 module epamodule
 using Libdl
 
-lib_path = "/home/augusto/Documents/IC-2020/optimized-calibration/libs-epanet/EPANET/build/lib/libepanet2.so" # absolute path to lib epanet binary file
+lib_path = "../../libs-epanet/EPANET/build/lib/libepanet2.so" # absolute path to lib epanet binary file
 lib = Libdl.dlopen(lib_path) 
 
 #=

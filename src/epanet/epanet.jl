@@ -2,8 +2,9 @@
 module epanet
 
 # Including epamodule.jl
-include("/home/augusto/Documents/IC-2020/epanet-julia/epamodule.jl")
+include("../epamodule/epamodule.jl")
 em = Main.epamodule
+
 export Network
 
 # struct para controle de paths
@@ -129,8 +130,7 @@ function get_real_values(
 end
 =#
 
-
-function simula(net::Network, new_rugo::Float64, numero_grupo::Int64)::Float64
+function simula(net, new_rugo::Float64, numero_grupo::Int64)::Float64
     muda_rugosidade.(net.group_link[numero_grupo], new_rugo)
     dados::Float64 = 0.0
     for i in keys(net.valores_reais)
@@ -142,46 +142,14 @@ function simula(net::Network, new_rugo::Float64, numero_grupo::Int64)::Float64
         reverte_vazao.(net.all_nodes,i)
     end
     #dados |> println
-    return dados*10/(3*6)
+    return dados/(3*6)
 end
 
-
-function f(net::Network, rugosidade::Float64, numero_grupo::Int64)::Float64
+function f(net, rugosidade::Float64, numero_grupo::Int64)::Float64
     #a = simula(net, rugosidade, numero_grupo)
     #a |> println 
     return simula(net, rugosidade, numero_grupo)
 end
-
-
-function calcula_derivada(net::Network, rugosidade::Float64, numero_grupo::Int64)
-    # f(x)-f(x-h)
-    #      h
-    #"calculando derivada" |> println
-    h = 0.0001
-    value = 0
-    value += (f(net, rugosidade, numero_grupo) - f(net,rugosidade-h, numero_grupo))/h
-    value += (f(net, rugosidade+h, numero_grupo) - f(net, rugosidade, numero_grupo))/h
-    value += (f(net, rugosidade+h, numero_grupo) - f(net, rugosidade-h, numero_grupo))/(h*2)
-    return value/3
-    #return value
-
-end
-
-
-function calcula_derivada_segunda(net::Network, rugosidade::Float64, numero_grupo::Int64)
-    # f'(x)-f'(x-h)
-    #     h
-    h = 0.0001
-    #"calculando segunda derivada" |> println
-    #return (f(net,rugosidade+2*h,numero_grupo)-2*f(net, rugosidade+h,numero_grupo)+f(net, rugosidade,numero_grupo))/h^2
-    #return (calcula_derivada(net, rugosidade,numero_grupo)-calcula_derivada(net,rugosidade-h,numero_grupo))/h
-    value = 0
-    value += (calcula_derivada(net, rugosidade, numero_grupo) - calcula_derivada(net,rugosidade-h, numero_grupo))/h
-    value += (calcula_derivada(net, rugosidade+h, numero_grupo) - calcula_derivada(net, rugosidade, numero_grupo))/h
-    value += (calcula_derivada(net, rugosidade+h, numero_grupo) - calcula_derivada(net, rugosidade-h, numero_grupo))/(h*2)
-    return value/3
-end
-
 
 
 end # end epanet module
