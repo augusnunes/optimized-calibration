@@ -130,6 +130,7 @@ function get_real_values(
 end
 =#
 
+# função objetivo
 function simula(net, new_rugo::Float64, numero_grupo::Int64)::Float64
     muda_rugosidade.(net.group_link[numero_grupo], new_rugo)
     dados::Float64 = 0.0
@@ -145,6 +146,7 @@ function simula(net, new_rugo::Float64, numero_grupo::Int64)::Float64
     return dados/(3*6)
 end
 
+# Outro nome para a função objetivo (mais curto)
 function f(net, rugosidade::Float64, numero_grupo::Int64)::Float64
     #a = simula(net, rugosidade, numero_grupo)
     #a |> println 
