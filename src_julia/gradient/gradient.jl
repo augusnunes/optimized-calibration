@@ -76,7 +76,7 @@ function gradient(
             printa_dados(paths, Int(ceil(interacao/3)), i, ∂f,Δ, intime_smvalues.link_values, epa.simula(net, intime_smvalues.link_values[i], i))
             
             # limitando interações para caso ele caia em um loop
-            if interacao >100
+            if interacao > 100
                 break
             end
         end

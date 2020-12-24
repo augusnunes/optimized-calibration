@@ -14,7 +14,7 @@ function calcula_derivada(net, rugosidade::Float64, numero_grupo::Int64)
     #      h
     value += (epa.f(net, rugosidade+h, numero_grupo) - epa.f(net, rugosidade, numero_grupo))/h
     # f(x+h)-f(x-h)
-    #      2h
+    #      h^2
     value += (epa.f(net, rugosidade+h, numero_grupo) - epa.f(net, rugosidade-h, numero_grupo))/(h*2)
     return value/3
     

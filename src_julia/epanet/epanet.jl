@@ -94,10 +94,9 @@ function muda_rugosidade(link::Int64, r::Float64)
     em.ENsetlinkvalue(link, em.EN_ROUGHNESS, r)
 end
 
-function update_network_values(net::Network, values::Simulation)
+function update_network_values(net::Network, values)
     for i in keys(values.link_values)
         muda_rugosidade.(net.group_link[i],values.link_values[i])
-
     end
     em.ENsolveH()
 end
