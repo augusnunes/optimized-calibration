@@ -2,6 +2,101 @@ import pandas as pd
 import epamodule as em
 import numpy as np
 
+class RealValues(object):
+    def __init__(self, path_links, target_links, target_rugo, dim=3, vazoes = [20,30,50,55,60,70]):
+        self.inp = path_links[2]
+        self.start_sim()
+        self.target_nodes = [em.ENgetlinknodes(x)[0] for x in target_links]
+        self.nodes = self.get_nodes(path_links[0])
+        self.links = open(path_links[1]).read().split('\n')
+        self.saida = path_links[3]
+        self.target_rugo = target_rugo
+        self.dim = dim
+        self.vazoes = vazoes
+        self.get_groups()
+        
+        
+    
+    def start_sim(self):
+        em.ENopen(self.inp)
+        em.ENopenH()
+    
+    def close_sim(self):
+        em.ENcloseH()
+        em.ENclose()
+    
+    def restart(self):
+        self.close_sim() 
+        self.start_sim() 
+    
+    def muda_vazao(self, vazao):
+        for node in self.nodes:
+            em.ENsetnodevalue(node, em.EN_BASEDEMAND, em.ENgetnodevalue(node, em.EN_BASEDEMAND)*vazao)
+    
+    def reverte_vazao(self, vazao):
+        for node in self.nodes:
+            em.ENsetnodevalue(node, em.EN_BASEDEMAND, em.ENgetnodevalue(node, em.EN_BASEDEMAND)/vazao)
+
+    def muda_rugosidade(self, no_link, rugosidade):
+        for link in self.groups[no_link]:
+            em.ENsetlinkvalue(link, em.EN_ROUGHNESS, rugosidade)
+    
+    def update_network_values(self, values):
+        for i in range(len(values)):
+            self.muda_rugosidade(i, values[i])
+        em.ENsolveH()
+
+    def get_nodes(self,path, test_value=1):
+        arq = open(path)
+        s = arq.read().split('\n')
+        nodes = []
+        for e in s:
+            #try:
+                #em.ENsetnodevalue(node, em.EN_BASEDEMAND, test_value)
+            nodes.append(em.ENgetnodeindex(e))
+            #except:
+             #   print(f'{e} isnt a node')
+        self.restart()
+        return nodes 
+
+    def get_groups(self):
+        groups = []
+        dim = self.dim
+        if len(self.links)%dim ==0:
+            count = 0
+            for i in range(dim):
+                groups.append(self.links[count:int(count+len(self.links)/dim)])
+                count += int(len(self.links)/dim)
+        else:
+            count = 0
+            for i in range(dim):
+                if i==dim-1:
+                    groups.append(self.links[count:])
+                else:
+                    groups.append(self.links[count:int(count+len(self.links)/dim)])
+                    count += int(len(self.links)/dim)
+                    
+        
+        getid = np.vectorize(em.ENgetlinkindex) 
+        self.groups = getid(groups)
+        return groups
+
+    def getRealValue(self):
+        values = []
+        self.update_network_values(self.target_rugo)
+        for vazao in self.vazoes:
+            self.muda_vazao(vazao)
+            for node in self.target_nodes:
+                em.ENsolveH()
+                pressure = em.ENgetnodevalue(node, em.EN_PRESSURE)
+                values.append([vazao, node, pressure])
+            self.reverte_vazao(vazao)
+        df = pd.DataFrame(np.array(values), columns = ['vazao', 'node', 'pressure'])
+        df.loc[:,'node'] = df['node'].astype(int)
+        df.to_csv(self.saida, index=False)
+
+
+
 class Rede(object):
     def __init__(self, l_links, group_links, t):
         self.nodes = l_links[0]
@@ -81,18 +176,20 @@ class Rede(object):
             self.muda_vazao(vazao)
             em.ENsolveH()
             for v in self.valores_reais[self.valores_reais['vazao']==vazao].values:
-                erro += abs(v[2]-em.ENgetnodevalue(int(v[1]), em.EN_PRESSURE))
+                erro += (v[2]-em.ENgetnodevalue(int(v[1]), em.EN_PRESSURE))**2
             self.reverte_vazao(vazao)
         return erro/(3*6)
 
-    def gradient(self, x, h=0.001): #vetor ponto
+    def gradient(self, x, h=0.0001): #vetor ponto
         g = np.zeros((len(x)))
         dim = len(x)
         for i in range(dim):
-            derivada_parcial = (self.objetivo(x) - self.objetivo([x[e]-h if e==i else x[e] for e in range(dim)]))/h
-            derivada_parcial += (self.objetivo([x[e]+h if e==i else x[e] for e in range(dim)]) - self.objetivo(x))/h
-            derivada_parcial += (self.objetivo([x[e]+h if e==i else x[e] for e in range(dim)])-self.objetivo([x[e]-h if e==i else x[e] for e in range(dim)]))/(2*h)
-            g[i] += round(derivada_parcial/3,3)
+            #derivada_parcial = (self.objetivo(x) - self.objetivo([x[e]-h if e==i else x[e] for e in range(dim)]))/h
+            #derivada_parcial += (self.objetivo([x[e]+h if e==i else x[e] for e in range(dim)]) - self.objetivo(x))/h
+            derivada_parcial = (self.objetivo([x[e]+h if e==i else x[e] for e in range(dim)])-self.objetivo([x[e]-h if e==i else x[e] for e in range(dim)]))/(2*h)
+            #g[i] += round(derivada_parcial,3)
+            g[i] += round(derivada_parcial,3)
+            
         return g
 
     def get_dist(self, p):
