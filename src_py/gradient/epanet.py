@@ -3,17 +3,22 @@ import epamodule as em
 import numpy as np
 
 class RealValues(object):
-    def __init__(self, path_links, target_links, target_rugo, dim=3, vazoes = [20,30,50,55,60,70]):
+    def __init__(self, path_links, target_rugo, vazoes = [20,30,50,55,60,70]):
+        self.dim = len(target_rugo)
         self.inp = path_links[2]
-        self.start_sim()
-        self.target_nodes = [em.ENgetlinknodes(x)[0] for x in target_links]
-        self.nodes = self.get_nodes(path_links[0])
         self.links = open(path_links[1]).read().split('\n')
         self.saida = path_links[3]
-        self.target_rugo = target_rugo
-        self.dim = dim
-        self.vazoes = vazoes
+        
+        self.start_sim()
+        self.nodes = self.get_nodes(path_links[0])
         self.get_groups()
+        self.target_nodes = [em.ENgetlinknodes(x)[0] for x in self.get_target_links()]
+
+        #self.target_nodes = [em.ENgetlinknodes(x)[0] for x in target_links]
+        
+        self.target_rugo = target_rugo
+        self.vazoes = vazoes
+        
         
         
     
@@ -76,10 +81,20 @@ class RealValues(object):
                     groups.append(self.links[count:int(count+len(self.links)/dim)])
                     count += int(len(self.links)/dim)
                     
-        
-        getid = np.vectorize(em.ENgetlinkindex) 
-        self.groups = getid(groups)
-        return groups
+        #getid = np.vectorize(em.ENgetlinkindex) 
+        #self.groups = getid(groups)
+        index_groups = []
+        for group in groups:
+            index_groups.append([em.ENgetlinkindex(e) for e in group])
+        self.groups = index_groups
+        return index_groups
+
+    def get_target_links(self):
+        t_links = []
+        for i in self.groups:
+            t_links.append(i[0])
+        return t_links
+
 
     def getRealValue(self):
         values = []
@@ -98,7 +113,9 @@ class RealValues(object):
 
 
 class Rede(object):
-    def __init__(self, l_links, group_links, t):
+    def __init__(self, l_links, group_links, t, bound):
+        self.bounds = bound
+        self.limita = np.vectorize(lambda x: bound[0] if x< bound[0] else bound[1] if x>bound[1] else x)
         self.nodes = l_links[0]
         self.links = l_links[1]
         self.inp = l_links[2]
@@ -170,15 +187,25 @@ class Rede(object):
         em.ENsolveH()
     
     def objetivo(self, values):
-        self.update_network_values(values)
-        erro = 0
-        for vazao in self.valores_reais['vazao'].unique():
-            self.muda_vazao(vazao)
-            em.ENsolveH()
-            for v in self.valores_reais[self.valores_reais['vazao']==vazao].values:
-                erro += (v[2]-em.ENgetnodevalue(int(v[1]), em.EN_PRESSURE))**2
-            self.reverte_vazao(vazao)
-        return erro/(3*6)
+        #values = self.limita(values)
+        #values = np.array(values)
+        #if sum(values > self.bounds[1])+sum(values < self.bounds[0]) > 0:
+        #    return 1000
+        #print(values)
+        try:
+            self.update_network_values(values)
+            erro = 0
+            for vazao in self.valores_reais['vazao'].unique():
+                self.muda_vazao(vazao)
+                em.ENsolveH()
+                for v in self.valores_reais[self.valores_reais['vazao']==vazao].values:
+                    erro += (v[2]-em.ENgetnodevalue(int(v[1]), em.EN_PRESSURE))**2
+                self.reverte_vazao(vazao)
+            self.ultimo_ponto = values
+        #self.restart()
+        finally:
+            return erro
+        return erro
 
     def gradient(self, x, h=0.0001): #vetor ponto
         g = np.zeros((len(x)))
