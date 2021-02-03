@@ -1,0 +1,1 @@
+- Testes com mesmo 500 pontos para todas as dimensões variando os conjuntos

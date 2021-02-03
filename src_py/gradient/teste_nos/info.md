@@ -1,0 +1,1 @@
+- Modificar classe RealValues para gerar a função com 30 nós para todas as dimensões

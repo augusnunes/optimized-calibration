@@ -1,6 +1,7 @@
 import pandas as pd
 import epamodule as em
 import numpy as np
+import os 
 
 class RealValues(object):
     def __init__(self, path_links, target_rugo, vazoes = [20,30,50,55,60,70]):
@@ -97,18 +98,19 @@ class RealValues(object):
 
 
     def getRealValue(self):
-        values = []
-        self.update_network_values(self.target_rugo)
-        for vazao in self.vazoes:
-            self.muda_vazao(vazao)
-            for node in self.target_nodes:
-                em.ENsolveH()
-                pressure = em.ENgetnodevalue(node, em.EN_PRESSURE)
-                values.append([vazao, node, pressure])
-            self.reverte_vazao(vazao)
-        df = pd.DataFrame(np.array(values), columns = ['vazao', 'node', 'pressure'])
-        df.loc[:,'node'] = df['node'].astype(int)
-        df.to_csv(self.saida, index=False)
+        if not os.path.isfile(self.saida):
+            values = []
+            self.update_network_values(self.target_rugo)
+            for vazao in self.vazoes:
+                self.muda_vazao(vazao)
+                for node in self.target_nodes:
+                    em.ENsolveH()
+                    pressure = em.ENgetnodevalue(node, em.EN_PRESSURE)
+                    values.append([vazao, node, pressure])
+                self.reverte_vazao(vazao)
+            df = pd.DataFrame(np.array(values), columns = ['vazao', 'node', 'pressure'])
+            df.loc[:,'node'] = df['node'].astype(int)
+            df.to_csv(self.saida, index=False)
 
 
 
@@ -144,6 +146,7 @@ class Rede(object):
         s = arq.read().split('\n')
         nodes = [em.ENgetnodeindex(e) for e in s]
         return nodes 
+    
     """
     function get_links(path_links::String, n_grupos::Int64)::Dict{Int64, Array{Int64}}
     println("Pegando links")
