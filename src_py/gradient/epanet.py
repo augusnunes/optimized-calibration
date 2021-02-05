@@ -224,3 +224,131 @@ class Rede(object):
 
     def get_dist(self, p):
         return np.linalg.norm(self.target-p)
+
+
+class RealValuesNos(object):
+    def __init__(self, path_links, target_rugo, nos_dim = 30, vazoes = [20,30,50,55,60,70]):
+        seld.nos_dim = nos_dim
+        self.dim = len(target_rugo)
+        self.inp = path_links[2]
+        self.links = open(path_links[1]).read().split('\n')
+        self.saida = path_links[3]
+        self.start_sim()
+        self.nodes = self.get_nodes(path_links[0])
+        self.get_groups()
+        self.target_nodes = self.get_target_nodes()
+        #self.target_nodes = [em.ENgetlinknodes(x)[0] for x in target_links]
+        self.target_rugo = target_rugo
+        self.vazoes = vazoes
+        
+        
+        
+    
+    def start_sim(self):
+        em.ENopen(self.inp)
+        em.ENopenH()
+    
+    def close_sim(self):
+        em.ENcloseH()
+        em.ENclose()
+    
+    def restart(self):
+        self.close_sim() 
+        self.start_sim() 
+    
+    def muda_vazao(self, vazao):
+        for node in self.nodes:
+            em.ENsetnodevalue(node, em.EN_BASEDEMAND, em.ENgetnodevalue(node, em.EN_BASEDEMAND)*vazao)
+    
+    def reverte_vazao(self, vazao):
+        for node in self.nodes:
+            em.ENsetnodevalue(node, em.EN_BASEDEMAND, em.ENgetnodevalue(node, em.EN_BASEDEMAND)/vazao)
+
+    def muda_rugosidade(self, no_link, rugosidade):
+        for link in self.groups[no_link]:
+            em.ENsetlinkvalue(link, em.EN_ROUGHNESS, rugosidade)
+    
+    def update_network_values(self, values):
+        for i in range(len(values)):
+            self.muda_rugosidade(i, values[i])
+        em.ENsolveH()
+
+    def get_nodes(self,path, test_value=1):
+        arq = open(path)
+        s = arq.read().split('\n')
+        nodes = []
+        for e in s:
+            #try:
+                #em.ENsetnodevalue(node, em.EN_BASEDEMAND, test_value)
+            nodes.append(em.ENgetnodeindex(e))
+            #except:
+             #   print(f'{e} isnt a node')
+        self.restart()
+        return nodes 
+
+    def get_groups(self):
+        groups = []
+        dim = self.dim
+        if len(self.links)%dim ==0:
+            count = 0
+            for i in range(dim):
+                groups.append(self.links[count:int(count+len(self.links)/dim)])
+                count += int(len(self.links)/dim)
+        else:
+            count = 0
+            for i in range(dim):
+                if i==dim-1:
+                    groups.append(self.links[count:])
+                else:
+                    groups.append(self.links[count:int(count+len(self.links)/dim)])
+                    count += int(len(self.links)/dim)
+        #getid = np.vectorize(em.ENgetlinkindex) 
+        #self.groups = getid(groups)
+        index_groups = []
+        for group in groups:
+            index_groups.append([em.ENgetlinkindex(e) for e in group])
+        self.groups = index_groups
+        return index_groups
+
+    def get_target_nodes(self):
+        groups = []
+        dim = self.nos_dim
+        if len(self.links)%dim ==0:
+            count = 0
+            for i in range(dim):
+                groups.append(self.links[count:int(count+len(self.links)/dim)])
+                count += int(len(self.links)/dim)
+        else:
+            count = 0
+            for i in range(dim):
+                if i==dim-1:
+                    groups.append(self.links[count:])
+                else:
+                    groups.append(self.links[count:int(count+len(self.links)/dim)])
+                    count += int(len(self.links)/dim)
+        index_groups = []
+        for group in groups:
+            index_groups.append([em.ENgetlinkindex(e) for e in group])
+        return [em.ENgetlinknodes(x)[0] for x in index_groups]
+
+    def get_target_links(self):
+        t_links = []
+        for i in self.groups:
+            t_links.append(i[0])
+        return t_links
+
+
+    def getRealValue(self):
+        if not os.path.isfile(self.saida):
+            values = []
+            self.update_network_values(self.target_rugo)
+            for vazao in self.vazoes:
+                self.muda_vazao(vazao)
+                for node in self.target_nodes:
+                    em.ENsolveH()
+                    pressure = em.ENgetnodevalue(node, em.EN_PRESSURE)
+                    values.append([vazao, node, pressure])
+                self.reverte_vazao(vazao)
+            df = pd.DataFrame(np.array(values), columns = ['vazao', 'node', 'pressure'])
+            df.loc[:,'node'] = df['node'].astype(int)
+            df.to_csv(self.saida, index=False)

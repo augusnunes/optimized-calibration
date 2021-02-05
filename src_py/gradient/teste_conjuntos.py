@@ -13,6 +13,7 @@ import os
 
 t = np.array([0.075, 0.812, 0.317, 0.581, 0.752, 0.994, 0.967, 0.511, 0.851,
               0.925, 0.842, 0.295, 0.633, 0.522, 0.306])
+              
 bot = CjsBot()
 seeds = [661, 308, 769, 343, 491]
 np.random.seed(45)
@@ -25,7 +26,7 @@ for seed in seeds:
     if not os.path.isdir(f'./teste_conjuntos/{seed}/'):
         os.mkdir(f'./teste_conjuntos/{seed}/')
     for dim in range(1,16):
-        bot.send_message(f"Estou na dimensão {i}")
+        bot.send_message(f"Estou n0a dimensão {i}")
         links = ["../../networks/c-town/nodes", 
             "../../networks/c-town/links", 
             "../../networks/c-town/rede.inp", 
@@ -61,7 +62,7 @@ for seed in seeds:
         np.savetxt(arq, x)
         arq.close()
 
-        arq = open(f'./teste_conjuntos/{seed}/{dim}/dists.txt')
+        arq = open(f'./teste_conjuntos/{seed}/{dim}/dists.txt', 'a')
         np.savetxt(arq, dists)
         arq.close()
     
