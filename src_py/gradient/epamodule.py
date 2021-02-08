@@ -8,7 +8,7 @@ import platform
 import datetime
 
 _plat= platform.system()
-if _plat=='Linux':
+if _plat=='Linux':  
   _lib = ctypes.CDLL("/home/augusto/optimized-calibration/libs-epanet/EPANET/build/lib/libepanet2.so")
 elif _plat=='Windows':
   try:
