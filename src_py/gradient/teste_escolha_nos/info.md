@@ -1,0 +1,3 @@
+- Variar escolha de nós
+- Variar quantidade de nós
+- Variar dimensões
