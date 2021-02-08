@@ -227,8 +227,9 @@ class Rede(object):
 
 
 class RealValuesNos(object):
-    def __init__(self, path_links, target_rugo, nos_dim = 30, vazoes = [20,30,50,55,60,70]):
+    def __init__(self, path_links, target_rugo, nos_dim = 30, posicao = 0, vazoes = [20,30,50,55,60,70]):
         self.nos_dim = nos_dim
+        self.posicao = posicao # em %
         self.dim = len(target_rugo)
         self.inp = path_links[2]
         self.links = open(path_links[1]).read().split('\n')
@@ -329,7 +330,7 @@ class RealValuesNos(object):
         index_groups = []
         for group in groups:
             index_groups.append([em.ENgetlinkindex(e) for e in group])
-        return [em.ENgetlinknodes(x[0])[0] for x in index_groups]
+        return [em.ENgetlinknodes(x[int(len(x)*posicao)])[0] for x in index_groups]
 
     def get_target_links(self):
         t_links = []
