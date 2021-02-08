@@ -1,0 +1,2 @@
+mode:ModeResult(mode=array([0.]), count=array([85]))
+sd:0.2609497724983286

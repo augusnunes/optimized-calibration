@@ -16,16 +16,14 @@ t = np.array([0.075, 0.812, 0.317, 0.581, 0.752, 0.994, 0.967, 0.511, 0.851,
               
 bot = CjsBot()
 seeds = [661, 308, 769, 343, 491]
-np.random.seed(45)
-pontos = np.random.random((500,i))*1 +0.001
 
 for seed in seeds:
     np.random.seed(seed)
     bot.send_message(f"Estou na {seeds.index(seed)+1}a de 5 ~~~ Simulação 2")
-    pontos = np.random.random((500,dim))*1 +0.001
     if not os.path.isdir(f'./teste_nos/{seed}/'):
         os.mkdir(f'./teste_nos/{seed}/')
     for dim in range(1,16):
+        pontos = np.random.random((500,dim))*1 +0.001
         links = ["../../networks/c-town/nodes", 
             "../../networks/c-town/links", 
             "../../networks/c-town/rede.inp", 
@@ -51,7 +49,7 @@ for seed in seeds:
                 continue
         dists = np.array(dists)
         sts = f'mode:{stats.mode(dists)}\nsd:{np.array(dists).std()}'
-        open(f'./teste_nos/{dim}/stats.txt', 'a').write(sts).close()
+        open(f'./teste_nos/{seed}/{dim}/stats.txt', 'a').write(sts)
     
         arq = open(f'./teste_nos/{seed}/{dim}/y.txt','a')
         np.savetxt(arq, y)

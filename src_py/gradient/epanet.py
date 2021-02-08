@@ -228,7 +228,7 @@ class Rede(object):
 
 class RealValuesNos(object):
     def __init__(self, path_links, target_rugo, nos_dim = 30, vazoes = [20,30,50,55,60,70]):
-        seld.nos_dim = nos_dim
+        self.nos_dim = nos_dim
         self.dim = len(target_rugo)
         self.inp = path_links[2]
         self.links = open(path_links[1]).read().split('\n')
@@ -273,7 +273,7 @@ class RealValuesNos(object):
             self.muda_rugosidade(i, values[i])
         em.ENsolveH()
 
-    def get_nodes(self,path, test_value=1):
+    def get_nodes(self,path, test_value=1): # pega todos os nós
         arq = open(path)
         s = arq.read().split('\n')
         nodes = []
@@ -286,7 +286,7 @@ class RealValuesNos(object):
         self.restart()
         return nodes 
 
-    def get_groups(self):
+    def get_groups(self): # pega os grupos de tubulações de acordo com a dimensão
         groups = []
         dim = self.dim
         if len(self.links)%dim ==0:
@@ -310,7 +310,7 @@ class RealValuesNos(object):
         self.groups = index_groups
         return index_groups
 
-    def get_target_nodes(self):
+    def get_target_nodes(self): # pega 30 nós de acordo com a divisão de nos_dim grupos de  tubulações
         groups = []
         dim = self.nos_dim
         if len(self.links)%dim ==0:
@@ -329,7 +329,7 @@ class RealValuesNos(object):
         index_groups = []
         for group in groups:
             index_groups.append([em.ENgetlinkindex(e) for e in group])
-        return [em.ENgetlinknodes(x)[0] for x in index_groups]
+        return [em.ENgetlinknodes(x[0])[0] for x in index_groups]
 
     def get_target_links(self):
         t_links = []
