@@ -1,0 +1,13 @@
+import thread
+import time
+import numpy as np
+from multithreading
+
+def calc_tempo_soma(array):
+	inicio= time.time()
+	count =0
+	for i in array:
+		count+=i
+	return time.time()-inicio
+
+

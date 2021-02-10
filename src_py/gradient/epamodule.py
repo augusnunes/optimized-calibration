@@ -8,8 +8,8 @@ import platform
 import datetime
 
 _plat= platform.system()
-if _plat=='Linux':  
-  _lib = ctypes.CDLL("/home/augusto/optimized-calibration/libs-epanet/EPANET/build/lib/libepanet2.so")
+if _plat=='Linux':  # "/home/augusto/Documents/IC-2020/optimized-calibration/libs-epanet/EPANET/build/lib/libepanet2.so"
+  _lib = ctypes.CDLL("/home/augusto/Documents/IC-2020/optimized-calibration/libs-epanet/EPANET/build/lib/libepanet2.so")
 elif _plat=='Windows':
   try:
     # if epanet2.dll compiled with __cdecl (as in OpenWaterAnalytics)
