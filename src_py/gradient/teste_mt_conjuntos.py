@@ -11,7 +11,7 @@ import time
 import os 
 from multiprocessing import Process, Lock
 
-def f(seed, dim):
+def f(seed, dim, pontos):
     links = ["../../networks/c-town/nodes", 
             "../../networks/c-town/links", 
             "../../networks/c-town/rede.inp", 
@@ -26,7 +26,6 @@ def f(seed, dim):
     x = []
     y = []
     dists = []
-    pontos = np.random.random((500,dim))*1 +0.001
     for i in range(pontos.shape[0]):
         try:
             o = optimize.minimize(net.objetivo, pontos[i,:], method='Nelder-Mead')
@@ -64,6 +63,7 @@ if __name__ == '__main__':
             os.mkdir(f'./teste_conjuntos2/{seed}/')
         for dim in range(1,16):
             bot.send_message(f"Estou na dimensão {dim}")
-            Process(target=f, args=(seed, dim)).start()
+            pontos = np.random.random((500,dim))*1 +0.001
+            Process(target=f, args=(seed, dim, pontos)).start()
                 
 bot.send_message("Acabou")
