@@ -307,7 +307,7 @@ class RealValuesNos(object):
         index_groups = []
         for group in groups:
             index_groups.append([em.ENgetlinkindex(e) for e in group])
-        return [em.ENgetlinknodes(x[int(len(x)*posicao)])[0] for x in index_groups]
+        return [em.ENgetlinknodes(x[int(len(x)*self.posicao)])[0] for x in index_groups]
 
     def get_target_links(self):
         t_links = []
