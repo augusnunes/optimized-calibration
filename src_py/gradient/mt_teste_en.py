@@ -88,19 +88,12 @@ if __name__ == '__main__':
                 #bot.send_message(f"Simulação 1 está {progresso/(15*5*5*5)*100:.2f} % completa")
                 
                 for dim in range(1,16):
-<<<<<<< HEAD
-                    Process(target=f, args=(bot, tt, seed, posicao_no, q_no, dim, lock)).start()
-                    progresso += 1
-                p.join()
-
-=======
                     pontos = np.random.random((500,dim))*1 +0.001
                     threads.append(Process(target=f, args=(bot, t, seed, posicao_no, q_no, dim, pontos, lock)))
         for thread in threads:
             thread.start()
         for thread in threads:
             thread.join()
->>>>>>> a8ea3c6d0d0490ad4d2696648222be42d47590ec
 
     termino = time.time()
     tempo_total = termino-comeco
