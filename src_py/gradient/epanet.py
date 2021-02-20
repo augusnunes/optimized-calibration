@@ -147,30 +147,7 @@ class Rede(object):
         nodes = [em.ENgetnodeindex(e) for e in s]
         return nodes 
     
-    """
-    function get_links(path_links::String, n_grupos::Int64)::Dict{Int64, Array{Int64}}
-    println("Pegando links")
-    s_links = string.(vec(split(read(open(path_links),String),"\n")))
-    tamanho = Int(round(length(s_links)/n_grupos))
-    l_start = 1
-    l_end = tamanho
-    count = 1
-    links = Dict{Int64, Array{Int64}}()
-    while length(s_links) >= l_end
-        if (length(s_links)-l_end) < tamanho
-            links[count] = em.ENgetlinkindex.(s_links[l_start:l_end]) 
-            links[count+1] = em.ENgetlinkindex.(s_links[l_start+tamanho:length(s_links)]) 
-            break;
-        end
-        links[count] = em.ENgetlinkindex.(s_links[l_start:l_end]) 
-        l_start += tamanho
-        l_end += tamanho
-        count += 1 
-    end
-    println(links)
-    return links
-    end
-    """
+
 
     def muda_vazao(self, vazao):
         for node in self.nodes:

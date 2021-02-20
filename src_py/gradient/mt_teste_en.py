@@ -12,7 +12,7 @@ import os
 from multiprocessing import Process, Lock
 
 
-def f(seed, posicao_no, q_no, dim, lock):
+def f(bot, tt, seed, posicao_no, q_no, dim, lock):
     # lock.acquire() para bloquear um processo
     # lock.release() para liberar um processo
     links = ["../../networks/c-town/nodes", 
@@ -81,10 +81,10 @@ if __name__ == '__main__':
                     os.mkdir(f'./teste_escolha_nos/{seed}/{posicao_no}/{q_no*100}')
                 bot.send_message(f"Simulação 1 está {progresso/(15*5*5*5)*100:.2f} % completa")
                 for dim in range(1,16):
-                    Process(target=f, args=(seed, posicao_no, q_no, dim, lock)).start()
+                    Process(target=f, args=(bot, tt, seed, posicao_no, q_no, dim, lock)).start()
                     progresso += 1
                 p.join()
-        # verificar questão de geração de numeros aleatórios com o seed, se não interfere o experimento
+
 
 termino = time.time()
 tempo_total = termino-comeco

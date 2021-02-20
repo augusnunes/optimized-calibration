@@ -13,7 +13,6 @@ lib = Libdl.dlopen(lib_path)
 
 =#
 
-
 # ENgeterror()
 #=
 function ENtoolkitError(erro)
@@ -113,6 +112,17 @@ function ENgetlinkvalue(index::Int64, paramcode::Int64)
         return "Error: "*string(err)
     end
     return ref.x
+end
+
+function ENgetlinknodes(index::Int64)
+    sym = Libdl.dlsym(lib, :ENgetlinknodes)
+    ref1 = Ref{Int64}(0)
+    ref2 = Ref{Int64}(0)
+    err = ccall(sym, Cint, (Cint, Ref{Int64},Ref{Int64}), index, ref1, ref2)
+    if err != 0
+        return "Error: "*string(err)
+    end
+    return [ref1.x, ref2.x]
 end
 
 function ENsetlinkvalue(index::Int64, paramcode::Int64, value::Float64)
