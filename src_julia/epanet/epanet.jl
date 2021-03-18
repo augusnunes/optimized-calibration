@@ -135,7 +135,7 @@ function objetivo(values::Array{Float64,1}, net)::Float64
 end
 
 
-function get_dist(x::Array{Float64,1}, net)::Float64
+function get_dist(x, net)::Float64
     return sum((net.target-x).^2)^0.5
 end
 
@@ -144,8 +144,8 @@ function get_groups(dim::Int64, tubulacoes)::Array{Array{Int64,1},1}
     if length(tubulacoes)%dim == 0
         count = 0
         for i in 1:dim
-            append!(groups, [tubulacoes[count+1:Int(count+length(tubulacoes)/dim)]])
-            count += Int(length(tubulacoes)/dim)
+            append!(groups, [tubulacoes[count+1:Int(count+length(tubulacoes)/dim |> round)]])
+            count += Int(length(tubulacoes)/dim |> round)
         end
     else
         count = 0
@@ -153,8 +153,8 @@ function get_groups(dim::Int64, tubulacoes)::Array{Array{Int64,1},1}
             if i==dim
                 append!(groups, [tubulacoes[count+1:end]])
             else
-                append!(groups, [tubulacoes[count+1:Int(count+length(tubulacoes)/dim)]])
-                count += Int(length(tubulacoes)/dim)
+                append!(groups, [tubulacoes[count+1:Int(count+length(tubulacoes)/dim |> round)]])
+                count += Int(length(tubulacoes)/dim  |> round)
             end  
         end  
     end
@@ -191,8 +191,8 @@ function get_target_nodes(dim::Int64, tubulacoes, posicao::Float64)::Array{Int64
     return [em.ENgetlinknodes(x[Int(length(x)*posicao |> round)])[1] for x in index_groups]
 end
 
-function get_real_values(paths::Paths, vazoes::Array{Int64,1}, target_rugo::Array{Float64, 1}, 
-    target_nodes::Array{Int64, 1}, g_links::Array{Array{Int64,1},1}, all_nodes::Array{Int64, 1})::Nothing
+function get_real_values(paths, vazoes, target_rugo, 
+    target_nodes, g_links, all_nodes)::Nothing
     if !isfile(paths.values)
         v = []
         n = []

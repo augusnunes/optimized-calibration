@@ -9,19 +9,13 @@ class RealValues(object):
         self.inp = path_links[2]
         self.links = open(path_links[1]).read().split('\n')
         self.saida = path_links[3]
-        
         self.start_sim()
         self.nodes = self.get_nodes(path_links[0])
         self.get_groups()
         self.target_nodes = [em.ENgetlinknodes(x)[0] for x in self.get_target_links()]
-
         #self.target_nodes = [em.ENgetlinknodes(x)[0] for x in target_links]
-        
         self.target_rugo = target_rugo
         self.vazoes = vazoes
-        
-        
-        
     
     def start_sim(self):
         em.ENopen(self.inp)
