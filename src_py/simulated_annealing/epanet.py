@@ -121,6 +121,7 @@ class Rede(object):
         self.valores_reais = pd.read_csv(l_links[3]) # dicionario(vazao -> [valores de pressão pra cada grupo])
         self.nodes = self.get_nodes()
         self.g_links = group_links # vetor[nº grupo] = [link1, link2, .....] começando do 0
+        self.anterior = 0
     
     def start_sim(self):
         em.ENopen(self.inp)
@@ -166,9 +167,10 @@ class Rede(object):
         #if sum(values > self.bounds[1])+sum(values < self.bounds[0]) > 0:
         #    return 1000
         #print(values)
+        erro =  self.anterior
         try:
-            self.update_network_values(values)
             erro = 0
+            self.update_network_values(values)
             for vazao in self.valores_reais['vazao'].unique():
                 self.muda_vazao(vazao)
                 em.ENsolveH()
@@ -177,9 +179,12 @@ class Rede(object):
                 self.reverte_vazao(vazao)
             self.ultimo_ponto = values
         #self.restart()
+            self.anterior = erro 
+            return erro 
         finally:
-            return erro
-        return erro
+            return self.anterior 
+
+         
 
     def gradient(self, x, h=0.0001): #vetor ponto
         g = np.zeros((len(x)))

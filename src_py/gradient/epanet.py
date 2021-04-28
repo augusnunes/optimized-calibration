@@ -134,14 +134,11 @@ class Rede(object):
         self.close_sim() 
         self.start_sim()   
 
-
     def get_nodes(self):
         arq = open(self.nodes)
         s = arq.read().split('\n')
         nodes = [em.ENgetnodeindex(e) for e in s]
         return nodes 
-    
-
 
     def muda_vazao(self, vazao):
         for node in self.nodes:

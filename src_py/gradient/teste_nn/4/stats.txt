@@ -1,2 +1,0 @@
-mode:ModeResult(mode=array([0.]), count=array([145]))
-sd:0.08850679271622428
