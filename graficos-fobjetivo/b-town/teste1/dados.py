@@ -10,7 +10,7 @@ def mudaRugosidade(grupo, rugosidade):
 
 def printaResultados(R1, R2, R3, erro):
     arq = open("./dados/dados.csv", 'a')
-    arq.write(str(R1)+","+str(R2)+","+str(R3)+","+str(erro)+"\n")
+    arq.write(f"{R1},{R2},{R3},{erro}\n")
     arq.close()
 
 # definindo a lista de trechos a qual será variada a rugosidade
@@ -41,10 +41,9 @@ for i in v:
     for j in v:
         mudaRugosidade(g2,j)
         for k in v:
-            
             mudaRugosidade(g3, k)
             em.ENsolveH()
-            erro = 1/3*(np.abs(n6-em.ENgetnodevalue(em.ENgetnodeindex("6"), em.EN_PRESSURE)) + np.abs(n11-em.ENgetnodevalue(em.ENgetnodeindex("11"), em.EN_PRESSURE)) + np.abs(n15 - em.ENgetnodevalue(em.ENgetnodeindex("15"), em.EN_PRESSURE)))
+            erro = (1/3)*(np.abs(n6-em.ENgetnodevalue(em.ENgetnodeindex("6"), em.EN_PRESSURE)) + np.abs(n11-em.ENgetnodevalue(em.ENgetnodeindex("11"), em.EN_PRESSURE)) + np.abs(n15 - em.ENgetnodevalue(em.ENgetnodeindex("15"), em.EN_PRESSURE)))
             printaResultados(i, j, k, round(erro,5))
 
 em.ENcloseH()

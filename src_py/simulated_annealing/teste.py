@@ -72,6 +72,7 @@ net = epa.Rede(links, rv.groups, t[:dim], [0.001,1])
 
 annealing = []
 f = []
+np.random.seed(seed)
 pontos = np.random.random((dim,100))*1+0.001
 for i in range(100):
     x0 = pontos[:,i]

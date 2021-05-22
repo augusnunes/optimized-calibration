@@ -10,7 +10,7 @@ import os
 class Dados():
     # Inicializa variáveis
     def __init__(self, v= '1'):
-        self.rede_path = '/home/augusto/Documents/IC-2020/epanet_arquivos/c-town/C-Town.inp'
+        self.rede_path = '/home/augusto/Documents/IC-2020/optimized-calibration/networks/c-town/rede.inp'
         self.v = v
         self.nodes = []
         self.grupos = {}

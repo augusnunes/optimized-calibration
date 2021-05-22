@@ -8,7 +8,7 @@ def mudaRugosidade(grupo, rugosidade):
 
 def printaResultados(R1, R2, erro, nome):
     arq = open(nome, 'a')
-    arq.write(str(R1)+","+str(R2)+","+str(erro)+"\n")
+    arq.write(f"{R1},{R2},{R3},{erro}\n")
     arq.close()
 
 # definindo a lista de trechos a qual será variada a rugosidade
