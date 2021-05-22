@@ -97,13 +97,9 @@ rv.getRealValue()
 rv.close_sim()
 net = epa.Rede(links, rv.groups, t[:dim], [0.001,1])
 
-
-
 dist = []
 f = []
 np.random.seed(seed)
-pontos = np.random.random((dim,100))
-pop = [list(i) for i in list(pontos)]
 for i in range(100):
     pontos = np.random.random((dim,40)).T
     pop = [list(i) for i in list(pontos)]
