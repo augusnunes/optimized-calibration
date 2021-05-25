@@ -9,6 +9,7 @@ from scipy import optimize
 from scipy import stats
 import time
 import os 
+import random
 from multiprocessing import Process, Lock
 
 def selecao(pop, f): 
@@ -103,7 +104,7 @@ np.random.seed(seed)
 for i in range(100):
     pontos = np.random.random((dim,40)).T
     pop = [list(i) for i in list(pontos)]
-    x = ga(net.objetivo, pop)
+    x = ga(net.objetivo, pop, 1000)
     dist.append(net.get_dist(x))
     f.append(net.objetivo(x))
 
