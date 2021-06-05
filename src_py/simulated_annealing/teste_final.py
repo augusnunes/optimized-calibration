@@ -8,9 +8,12 @@ from cjsbot import CjsBot
 from scipy import optimize
 from scipy import stats
 import time
+import datetime
 import os 
 from multiprocessing import Process, Lock
 
+def format_data(t):
+    return datetime.timedelta(seconds=t).__str__()
 
 def simulated_annealing(x0, f, min_score=0.1, t0=100, t_min = 0.1, alpha=0.9, iter_MAX=50):
     x = x0
@@ -22,11 +25,9 @@ def simulated_annealing(x0, f, min_score=0.1, t0=100, t_min = 0.1, alpha=0.9, it
         for i in range(iter_MAX):# até que atinja o equilíbrio na temperatura atual
             y = x + np.random.uniform(-0.01,0.01,len(x))*np.random.randint(0,2,(len(x),)) # perturbe o x 
             delta_xy = f(y) - fx # faça a variação do custo, se negativa, então y tem um custo menor
-            metropolis.append(np.exp(-delta_xy/t))
             if (delta_xy <= 0) or np.random.uniform(0,1) < np.exp(-delta_xy/t): # a aceitação do novo ponto segue o critério de metropolis
                 x = y
                 fx = f(x)
-                caminho2.append(x)
                 if fx < fxbsf: # caso o ponto seja aceito pelo critério de metropolis, ele é avaliado
                     x_bsf = x 
                     fxbsf = f(x_bsf)
@@ -35,10 +36,13 @@ def simulated_annealing(x0, f, min_score=0.1, t0=100, t_min = 0.1, alpha=0.9, it
 
 t = np.array([0.075, 0.812, 0.317, 0.581, 0.752, 0.994, 0.967, 0.511, 0.851,
               0.925, 0.842, 0.295, 0.633, 0.522, 0.306])
-seeds = [661, 308, 769, 343, 491]
+seeds = [308, 343, 491, 661, 769]
 posicao_nos = [0.1, 0.3, 0.5, 0.7, 0.9]
 q_nos = [10, 20, 30, 40, 50]   
 
+inicio = time.time()
+
+bot = CjsBot()
 diretorio = f'./teste_final/'
 for seed in seeds:
     d2 = diretorio+f'{seed}/'
@@ -68,6 +72,7 @@ for seed in seeds:
                 pontos = np.random.random((dim,100))*1+0.001
                 dist = []
                 f = []
+                bot.send_message(f"Seed: {seed}\nQuantidade nós: {q_no}\nPos: {p}\nDim: {dim}\nTempo: {format_data(time.time()-inicio)}")
                 for i in range(100):
                     x = simulated_annealing(pontos[:,i], net.objetivo, min_score=0.0009, t_min=0.00000001, t0=10, alpha=0.9 , iter_MAX=30)
                     f.append(net.objetivo(x))
@@ -88,3 +93,5 @@ for seed in seeds:
                 np.savetxt(arq, pontos)
                 arq.close()
 
+fim = time.time()
+bot.send_message(f"Fim da simulação!!\nTempo: {format_data(fim-inicio)}")
