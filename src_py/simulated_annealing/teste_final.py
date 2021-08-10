@@ -23,8 +23,9 @@ def simulated_annealing(x0, f, min_score=0.1, t0=100, t_min = 0.1, alpha=0.9, it
     t = t0 #aquece até a temperatura t0
     historico = []
     while t > t_min and f(x_bsf)>min_score: # até que atinja a temperatura mínima para parar
-        if historico[-1] == historico[-9]:
-            break
+        if len(historico) > 10:
+            if historico[-1] == historico[-9]:
+                break
         for i in range(iter_MAX):# até que atinja o equilíbrio na temperatura atual
             y = x + np.random.uniform(-0.01,0.01,len(x))*np.random.randint(0,2,(len(x),)) # perturbe o x 
             delta_xy = f(y) - fx # faça a variação do custo, se negativa, então y tem um custo menor
@@ -76,6 +77,7 @@ if __name__ == '__main__':
     posicao_nos = [0.1, 0.3, 0.5, 0.7, 0.9]
     q_nos = [10, 20, 30, 40, 50]   
 
+
     inicio = time.time()
 
     bot = CjsBot()
@@ -97,7 +99,8 @@ if __name__ == '__main__':
                     d5 = d4+f"{dim}/"
                     if not os.path.isdir(d5):
                         os.mkdir(d5)
-                    f(t, d5, seed, q_no, p, dim)
+                    if os.path.isfile(d5+'f.txt'):
+                        continue
                     threads.append(Process(target=f, args=(t, d5, seed, q_no, p, dim)))
                 for thread in threads:
                     thread.start()
